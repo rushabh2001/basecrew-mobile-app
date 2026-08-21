@@ -1,0 +1,69 @@
+
+use_modular_headers!
+
+# Resolve react_native_pods.rb with node to allow for hoisting
+require Pod::Executable.execute_command('node', ['-p',
+  'require.resolve(
+    "react-native/scripts/react_native_pods.rb",
+    {paths: [process.argv[1]]},
+  )', __dir__]).strip
+
+platform :ios, min_ios_version_supported
+prepare_react_native_project!
+
+linkage = ENV['USE_FRAMEWORKS']
+if linkage != nil
+  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
+  use_frameworks! :linkage => linkage.to_sym
+end
+
+# Xcode 26 + fmt 11.0.2 (RN 0.79): disable consteval that Apple Clang rejects.
+def patch_fmt_for_xcode26(installer)
+  fmt_base = File.join(installer.sandbox.root, 'fmt', 'include', 'fmt', 'base.h')
+  return unless File.exist?(fmt_base)
+
+  content = File.read(fmt_base)
+  return if content.include?('Xcode 26 workaround')
+
+  patched = content.gsub(
+    /^(#elif defined\(__cpp_consteval\)\n#\s*define FMT_USE_CONSTEVAL) 1/,
+    "// Xcode 26 workaround: disable consteval\n\\1 0"
+  )
+  return if patched == content
+
+  File.chmod(0644, fmt_base)
+  File.write(fmt_base, patched)
+  Pod::UI.puts 'Patched fmt/base.h for Xcode 26 (FMT_USE_CONSTEVAL=0)'.green
+end
+
+target 'BaseCrewMobile' do
+  config = use_native_modules!
+
+  use_react_native!(
+    :path => config[:reactNativePath],
+    # An absolute path to your application root.
+    :app_path => "#{Pod::Config.instance.installation_root}/.."
+  )
+
+
+  
+  post_install do |installer|
+    # https://github.com/facebook/react-native/blob/main/packages/react-native/scripts/react_native_pods.rb#L197-L202
+    react_native_post_install(
+      installer,
+      config[:reactNativePath],
+      :mac_catalyst_enabled => false,
+      # :ccache_enabled => true
+    )
+
+    patch_fmt_for_xcode26(installer)
+
+    installer.pods_project.targets.each do |target|
+      if target.name == 'fmt'
+        target.build_configurations.each do |cfg|
+          cfg.build_settings['CLANG_CXX_LANGUAGE_STANDARD'] = 'c++17'
+        end
+      end
+    end
+  end
+end
