@@ -6,14 +6,14 @@ import {
   Text,
   ViewStyle,
 } from 'react-native';
-import { colors, spacing } from '../theme';
+import { colors, radius, spacing } from '../theme';
 
 type Props = {
   label: string;
   onPress: () => void;
   disabled?: boolean;
   loading?: boolean;
-  variant?: 'primary' | 'danger' | 'ghost';
+  variant?: 'primary' | 'danger' | 'ghost' | 'success' | 'navy';
   style?: ViewStyle;
 };
 
@@ -30,8 +30,12 @@ export function PrimaryButton({
       ? colors.danger
       : variant === 'ghost'
         ? 'transparent'
-        : colors.primary;
-  const textColor = variant === 'ghost' ? colors.primary : '#fff';
+        : variant === 'success'
+          ? colors.success
+          : variant === 'navy'
+            ? colors.navy
+            : colors.primary;
+  const textColor = variant === 'ghost' ? colors.primaryDeep : '#fff';
 
   return (
     <Pressable
@@ -40,7 +44,7 @@ export function PrimaryButton({
       disabled={disabled || loading}
       style={({ pressed }) => [
         styles.btn,
-        { backgroundColor: bg, opacity: pressed || disabled || loading ? 0.7 : 1 },
+        { backgroundColor: bg, opacity: pressed || disabled || loading ? 0.72 : 1 },
         variant === 'ghost' && styles.ghost,
         style,
       ]}>
@@ -56,13 +60,13 @@ export function PrimaryButton({
 const styles = StyleSheet.create({
   btn: {
     minHeight: 52,
-    borderRadius: 12,
+    borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
   },
   ghost: {
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderColor: colors.border,
   },
   label: {

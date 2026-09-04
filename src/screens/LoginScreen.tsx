@@ -11,8 +11,9 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { ApiError } from '../api/client';
 import { useAuth } from '../auth/AuthContext';
+import { BrandLogo } from '../components/BrandLogo';
 import { PrimaryButton } from '../components/PrimaryButton';
-import { colors, spacing } from '../theme';
+import { colors, radius, spacing } from '../theme';
 
 export function LoginScreen() {
   const { signIn } = useAuth();
@@ -46,13 +47,18 @@ export function LoginScreen() {
 
   return (
     <SafeAreaView style={styles.safe}>
+      <View style={styles.hero}>
+        <BrandLogo variant="dark" height={42} />
+      </View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <Text style={styles.brand}>BaseCrew</Text>
+        <ScrollView
+          contentContainerStyle={styles.container}
+          keyboardShouldPersistTaps="handled">
+          <Text style={styles.title}>Welcome back</Text>
           <Text style={styles.subtitle}>
-            Sign in with your organization code to clock in from the field.
+            Sign in with your organization to clock in, manage tasks, and stay aligned with your team.
           </Text>
 
           <View style={styles.field}>
@@ -109,19 +115,27 @@ export function LoginScreen() {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
+  hero: {
+    backgroundColor: colors.navy,
+    paddingVertical: spacing.xl,
+    paddingHorizontal: spacing.lg,
+    alignItems: 'center',
+    borderBottomLeftRadius: radius.xl,
+    borderBottomRightRadius: radius.xl,
+  },
   container: {
     flexGrow: 1,
     padding: spacing.lg,
-    justifyContent: 'center',
+    paddingTop: spacing.xl,
   },
-  brand: {
-    fontSize: 36,
+  title: {
+    fontSize: 28,
     fontWeight: '700',
-    color: colors.primary,
-    marginBottom: spacing.sm,
+    color: colors.navy,
+    marginBottom: spacing.xs,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: 15,
     color: colors.muted,
     marginBottom: spacing.xl,
     lineHeight: 22,
@@ -137,7 +151,7 @@ const styles = StyleSheet.create({
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 12,
+    borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: 14,
     fontSize: 16,

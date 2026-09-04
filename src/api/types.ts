@@ -32,7 +32,23 @@ export type TaskItem = {
   status: string;
   priority?: string | null;
   dueDate?: string | null;
+  archivedAt?: string | null;
+  description?: string | null;
   project?: { id: string; name: string } | null;
+  totalTrackedSeconds?: number;
+};
+
+export type ProjectItem = {
+  id: string;
+  name: string;
+  status?: string | null;
+  type?: string | null;
+  hasAccess?: boolean;
+  progress?: number;
+  totalTasks?: number;
+  completedTasks?: number;
+  _count?: { tasks?: number };
+  clearedAt?: string | null;
 };
 
 export type NotificationItem = {
@@ -42,6 +58,49 @@ export type NotificationItem = {
   read: boolean;
   createdAt: string;
   type?: string;
+};
+
+export type ReminderItem = {
+  id: string;
+  title: string;
+  message: string | null;
+  remindAt: string;
+  type: string;
+  isDone: boolean;
+  emailNotify?: boolean;
+  taskId?: string | null;
+  projectId?: string | null;
+};
+
+export type TeamClockRow = {
+  userId: string;
+  name: string;
+  role: string;
+  departmentType: string | null;
+  clockIn: string | null;
+  lunchStart: string | null;
+  lunchEnd: string | null;
+  lunchCount: number;
+  clockOut: string | null;
+  clockInLabel?: string | null;
+  clockOutLabel?: string | null;
+};
+
+export type WorklogUser = {
+  userId: string;
+  name: string;
+  email: string;
+  department: string | null;
+  totalHours: number;
+  totalSeconds: number;
+  entries: Array<{
+    entryId: string;
+    taskTitle: string;
+    projectName: string | null;
+    hours: number;
+    durationSeconds: number;
+    running: boolean;
+  }>;
 };
 
 export type ClockGeoPayload = {
