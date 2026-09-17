@@ -26,6 +26,15 @@ export type ClockSession = {
   lunchBreaks?: Array<{ id: string; startAt: string; endAt: string | null }>;
 };
 
+export type OrgUser = {
+  id: string;
+  name: string;
+  email: string;
+  role?: string;
+  avatar?: string | null;
+  isActive?: boolean;
+};
+
 export type TaskItem = {
   id: string;
   title: string;
@@ -34,6 +43,13 @@ export type TaskItem = {
   dueDate?: string | null;
   archivedAt?: string | null;
   description?: string | null;
+  estimatedHours?: number | null;
+  progress?: number | null;
+  tags?: string[] | string | null;
+  assignedTo?: string | null;
+  assigneeIds?: string[];
+  assignees?: Array<{ id: string; name: string; avatar?: string | null }>;
+  projectId?: string | null;
   project?: { id: string; name: string } | null;
   totalTrackedSeconds?: number;
 };
@@ -41,14 +57,20 @@ export type TaskItem = {
 export type ProjectItem = {
   id: string;
   name: string;
+  description?: string | null;
   status?: string | null;
+  priority?: string | null;
   type?: string | null;
+  parentId?: string | null;
+  startDate?: string | null;
+  dueDate?: string | null;
   hasAccess?: boolean;
   progress?: number;
   totalTasks?: number;
   completedTasks?: number;
   _count?: { tasks?: number };
   clearedAt?: string | null;
+  members?: Array<{ userId?: string; user?: { id: string; name: string } }>;
 };
 
 export type NotificationItem = {
@@ -68,6 +90,7 @@ export type ReminderItem = {
   type: string;
   isDone: boolean;
   emailNotify?: boolean;
+  pushNotify?: boolean;
   taskId?: string | null;
   projectId?: string | null;
 };

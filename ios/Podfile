@@ -2,6 +2,11 @@
 # global modular headers make React-RuntimeCore and React-jsitooling both expose
 # module react_runtime, which breaks the build on Xcode 26 (RN 0.79 + New Arch).
 
+# Prefer git Specs when cdn.cocoapods.org returns 403 (common on some networks).
+# source 'https://cdn.cocoapods.org/'
+# Fallback if CDN is blocked: comment the line above and uncomment:
+source 'https://github.com/CocoaPods/Specs.git'
+
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',
   'require.resolve(
@@ -12,11 +17,12 @@ require Pod::Executable.execute_command('node', ['-p',
 platform :ios, min_ios_version_supported
 prepare_react_native_project!
 
-linkage = ENV['USE_FRAMEWORKS']
-if linkage != nil
-  Pod::UI.puts "Configuring Pod with #{linkage}ally linked Frameworks".green
-  use_frameworks! :linkage => linkage.to_sym
-end
+# React Native Firebase: skip Xcode SPM (often hangs / fails) and use CocoaPods.
+$RNFirebaseDisableSPM = true
+$RNFirebaseAsStaticFramework = true
+
+# Required for firebase-ios-sdk via CocoaPods with RN Firebase.
+use_frameworks! :linkage => :static
 
 # Xcode 26 + fmt 11.0.2 (RN 0.79): disable consteval that Apple Clang rejects.
 def patch_fmt_for_xcode26(installer)
@@ -76,6 +82,33 @@ def patch_with_environment_for_spaces(react_native_path)
   Pod::UI.puts 'Patched with-environment.sh for paths with spaces'.green
 end
 
+# Hermes replace script runs `tar -xf $path` unquoted; spaces in the repo path break Archive.
+def patch_hermes_replace_for_spaces(react_native_path)
+  script = File.join(react_native_path, 'sdks/hermes-engine/utils/replace_hermes_version.js')
+  return unless File.exist?(script)
+
+  content = File.read(script)
+  return if content.include?('JSON.stringify(tarballURLPath)')
+
+  unless content.include?('tar -xf ${tarballURLPath} -C ${finalLocation}')
+    Pod::UI.puts 'Hermes replace script already uses a different tar invocation; skip space patch'.yellow
+    return
+  end
+
+  patched = content.gsub(
+    'execSync(`tar -xf ${tarballURLPath} -C ${finalLocation}`);',
+    <<~JS.strip
+      // Quote paths: repo folders with spaces (e.g. "TF PMS") break unquoted tar args.
+        execSync(`tar -xf ${JSON.stringify(tarballURLPath)} -C ${JSON.stringify(finalLocation)}`);
+    JS
+  )
+  return if patched == content
+
+  File.chmod(0644, script)
+  File.write(script, patched)
+  Pod::UI.puts 'Patched replace_hermes_version.js for paths with spaces'.green
+end
+
 target 'BaseCrewMobile' do
   config = use_native_modules!
 
@@ -98,6 +131,7 @@ target 'BaseCrewMobile' do
 
     patch_fmt_for_xcode26(installer)
     patch_with_environment_for_spaces(config[:reactNativePath])
+    patch_hermes_replace_for_spaces(config[:reactNativePath])
     fix_rn_script_phases(installer.pods_project)
 
     app_project_path = File.join(__dir__, 'BaseCrewMobile.xcodeproj')

@@ -1,5 +1,17 @@
 /** API base URL of the BaseCrew web app (no trailing slash). */
-export const API_BASE_URL = 'https://app.basecrew.in';
+const PROD_API = 'https://app.basecrew.in';
+
+/**
+ * Physical device + local Next.js: use your Mac LAN IP (same Wi-Fi).
+ * Run: `npx next dev --hostname 0.0.0.0`
+ *
+ * Keep PROD when testing against the live Hostinger deploy.
+ * Set USE_LOCAL_API=true below only while iterating on APIs not yet deployed.
+ */
+const USE_LOCAL_API = false;
+const LOCAL_API = 'http://192.168.29.103:3000';
+
+export const API_BASE_URL = USE_LOCAL_API ? LOCAL_API : PROD_API;
 
 /**
  * Change before running:

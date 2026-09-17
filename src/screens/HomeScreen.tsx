@@ -12,7 +12,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import * as api from '../api/client';
 import type { ClockSession, TaskItem } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
-import { AppIcon } from '../components/AppIcon';
+import { AppIcon, type AppIconName } from '../components/AppIcon';
 import { DayGreeting } from '../components/DayGreeting';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { SwipeableTaskRow } from '../components/SwipeableTaskRow';
@@ -91,6 +91,8 @@ export function HomeScreen() {
   const statsData = dashboard?.stats || dashboard || {};
   const openTasks = statsData.myTasks ?? tasks.filter(t => t.status !== 'completed').length;
   const overdue = statsData.overdueTasksCount ?? 0;
+  const hoursValue =
+    statsData.todayHours != null ? Number(statsData.todayHours).toFixed(1) : '-';
 
   async function runAction(action: 'clock-in' | 'clock-out' | 'lunch-start' | 'lunch-end') {
     if (!token || busy) return;
@@ -155,19 +157,32 @@ export function HomeScreen() {
         showsVerticalScrollIndicator={false}>
         <View style={styles.topPad}>
           <ScreenHeader showLogo={false} />
-          <DayGreeting
-            name={user?.name}
-            subtitle="Plan your day and stay on track"
-          />
+          <DayGreeting name={user?.name} subtitle="Plan your day and stay on track" />
         </View>
 
-        {/* Compact attendance strip */}
         <View style={[styles.clockStrip, shadows.sm]}>
           <View style={styles.clockLeft}>
-            <View style={[styles.statusDot, { backgroundColor: done ? colors.success : clockedIn ? colors.primary : colors.muted }]} />
+            <View
+              style={[
+                styles.statusDot,
+                {
+                  backgroundColor: done
+                    ? colors.success
+                    : clockedIn
+                      ? colors.primary
+                      : colors.muted,
+                },
+              ]}
+            />
             <View>
               <Text style={styles.clockLabel}>
-                {done ? 'Day complete' : onLunch ? 'On lunch' : clockedIn ? 'Working' : 'Not clocked in'}
+                {done
+                  ? 'Day complete'
+                  : onLunch
+                    ? 'On lunch'
+                    : clockedIn
+                      ? 'Working'
+                      : 'Not clocked in'}
               </Text>
               <Text style={styles.clockTime}>
                 {clockedIn
@@ -183,33 +198,42 @@ export function HomeScreen() {
               style={[styles.clockBtn, busy && { opacity: 0.6 }]}
               disabled={busy}
               onPress={() => runAction(primaryClockAction.action)}>
-              <AppIcon name={primaryClockAction.icon} size={16} color="#fff" />
+              <AppIcon name={primaryClockAction.icon} size={18} color="#fff" />
               <Text style={styles.clockBtnText}>{primaryClockAction.label}</Text>
             </Pressable>
           ) : (
-            <AppIcon name="check" size={22} color={colors.success} />
+            <AppIcon name="check" size={24} color={colors.success} />
           )}
         </View>
 
         {message ? <Text style={styles.ok}>{message}</Text> : null}
         {error ? <Text style={styles.err}>{error}</Text> : null}
 
-        {/* Quick stats */}
         <View style={styles.statsRow}>
-          <StatPill icon="check-square" label="Open" value={String(openTasks)} />
-          <StatPill icon="alert-circle" label="Overdue" value={String(overdue)} accent={overdue > 0} />
-          <StatPill
-            icon="activity"
+          <StatCard
+            icon="list"
+            label="Open"
+            value={String(openTasks)}
+            hint="View all tasks"
+            onPress={() => navigation.navigate('Tasks')}
+          />
+          <StatCard
+            icon="alert-circle"
+            label="Overdue"
+            value={String(overdue)}
+            hint="Review overdue"
+            accent={overdue > 0}
+            onPress={() => navigation.navigate('Tasks')}
+          />
+          <StatCard
+            icon="hourglass"
             label="Hours"
-            value={
-              statsData.todayHours != null
-                ? Number(statsData.todayHours).toFixed(1)
-                : '-'
-            }
+            value={hoursValue}
+            hint="Team activity"
+            onPress={() => navigation.navigate('Team')}
           />
         </View>
 
-        {/* Focus today - Any.do planner section */}
         <View style={styles.sectionHead}>
           <Text style={styles.sectionTitle}>Focus today</Text>
           <Pressable onPress={() => navigation.navigate('Tasks')}>
@@ -220,10 +244,10 @@ export function HomeScreen() {
         <View style={[styles.taskCard, shadows.sm]}>
           {focusTasks.length === 0 ? (
             <View style={styles.emptyFocus}>
-              <AppIcon name="check" size={32} color={colors.success} />
+              <AppIcon name="check" size={36} color={colors.success} />
               <Text style={styles.emptyFocusTitle}>You're all set for today</Text>
               <Pressable onPress={() => navigation.navigate('Tasks')}>
-                <Text style={styles.seeAll}>Add tasks in Work</Text>
+                <Text style={styles.seeAll}>Add tasks</Text>
               </Pressable>
             </View>
           ) : (
@@ -232,6 +256,7 @@ export function HomeScreen() {
                 key={task.id}
                 task={task}
                 onToggle={toggleTask}
+                onPress={() => navigation.navigate('Tasks')}
                 showProject
               />
             ))
@@ -254,23 +279,38 @@ export function HomeScreen() {
   );
 }
 
-function StatPill({
+function StatCard({
   icon,
   label,
   value,
+  hint,
   accent,
+  onPress,
 }: {
-  icon: 'check-square' | 'alert-circle' | 'activity';
+  icon: AppIconName;
   label: string;
   value: string;
+  hint: string;
   accent?: boolean;
+  onPress: () => void;
 }) {
   return (
-    <View style={[styles.statPill, accent && styles.statPillAccent]}>
-      <AppIcon name={icon} size={14} color={accent ? colors.danger : colors.primaryDeep} />
+    <Pressable
+      onPress={onPress}
+      style={[styles.statCard, accent && styles.statCardAccent]}>
+      <View style={[styles.statIconWrap, accent && styles.statIconWrapAccent]}>
+        <AppIcon
+          name={icon}
+          size={20}
+          color={accent ? colors.danger : colors.primaryDeep}
+        />
+      </View>
       <Text style={[styles.statValue, accent && { color: colors.danger }]}>{value}</Text>
       <Text style={styles.statLabel}>{label}</Text>
-    </View>
+      <Text style={styles.statHint} numberOfLines={1}>
+        {hint}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -292,7 +332,7 @@ function SecondaryBtn({
       onPress={onPress}
       disabled={disabled}
       style={[styles.secondaryBtn, danger && styles.secondaryBtnDanger]}>
-      <AppIcon name={icon} size={16} color={danger ? colors.danger : colors.primaryDeep} />
+      <AppIcon name={icon} size={18} color={danger ? colors.danger : colors.primaryDeep} />
       <Text style={[styles.secondaryLabel, danger && { color: colors.danger }]}>{label}</Text>
     </Pressable>
   );
@@ -328,7 +368,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
   clockBtnText: { color: '#fff', fontWeight: '700', fontSize: 13 },
-  ok: { color: colors.success, marginTop: spacing.sm, paddingHorizontal: spacing.lg, fontWeight: '600' },
+  ok: {
+    color: colors.success,
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.lg,
+    fontWeight: '600',
+  },
   err: { color: colors.danger, marginTop: spacing.sm, paddingHorizontal: spacing.lg },
   statsRow: {
     flexDirection: 'row',
@@ -336,19 +381,34 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.lg,
     marginTop: spacing.lg,
   },
-  statPill: {
+  statCard: {
     flex: 1,
     backgroundColor: colors.surface,
     borderRadius: radius.md,
-    padding: spacing.sm,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.sm,
     alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
-    gap: 2,
+    gap: 4,
   },
-  statPillAccent: { borderColor: colors.dangerSoft, backgroundColor: colors.dangerSoft },
-  statValue: { fontSize: 20, fontWeight: '700', color: colors.text },
-  statLabel: { fontSize: 11, fontWeight: '600', color: colors.muted },
+  statCardAccent: {
+    borderColor: colors.dangerSoft,
+    backgroundColor: colors.dangerSoft,
+  },
+  statIconWrap: {
+    width: 36,
+    height: 36,
+    borderRadius: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.primarySoft,
+    marginBottom: 2,
+  },
+  statIconWrapAccent: { backgroundColor: '#fff' },
+  statValue: { fontSize: 22, fontWeight: '700', color: colors.text },
+  statLabel: { fontSize: 12, fontWeight: '700', color: colors.text },
+  statHint: { fontSize: 10, fontWeight: '500', color: colors.muted, textAlign: 'center' },
   sectionHead: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -387,6 +447,9 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
   },
-  secondaryBtnDanger: { backgroundColor: colors.dangerSoft, borderColor: colors.dangerSoft },
+  secondaryBtnDanger: {
+    backgroundColor: colors.dangerSoft,
+    borderColor: colors.dangerSoft,
+  },
   secondaryLabel: { fontWeight: '700', color: colors.primaryDeep, fontSize: 14 },
 });

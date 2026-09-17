@@ -4,6 +4,7 @@ import type {
   ClockSession,
   MobileUser,
   NotificationItem,
+  OrgUser,
   ProjectItem,
   ReminderItem,
   TaskItem,
@@ -73,11 +74,19 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     if (res.status === 401 && onUnauthorized) {
       onUnauthorized();
     }
-    throw new ApiError(
-      data?.error || `Request failed (${res.status})`,
-      res.status,
-      data?.code,
-    );
+    const rawError = typeof data?.error === 'string' ? data.error : '';
+    const looksLikeHtml =
+      rawError.startsWith('<!') || rawError.toLowerCase().includes('<html');
+    let message = looksLikeHtml ? '' : rawError;
+    if (!message) {
+      if (res.status === 404) {
+        message =
+          'API endpoint not found. Deploy the latest BaseCrew web app (push routes), or point this build at a local server that has them.';
+      } else {
+        message = `Request failed (${res.status})`;
+      }
+    }
+    throw new ApiError(message, res.status, data?.code);
   }
   return data as T;
 }
@@ -123,18 +132,25 @@ export function fetchTasks(token?: string | null, query = '') {
   return request<TaskItem[]>(`/api/tasks${query}`, { token });
 }
 
-export function createTask(
-  token: string | null | undefined,
-  body: { title: string; status?: string; priority?: string; projectId?: string },
-) {
+export type TaskWriteBody = {
+  title?: string;
+  description?: string | null;
+  status?: string;
+  priority?: string;
+  projectId?: string | null;
+  dueDate?: string | null;
+  estimatedHours?: number | null;
+  progress?: number;
+  tags?: string[];
+  assignedTo?: string | null;
+  assigneeIds?: string[];
+};
+
+export function createTask(token: string | null | undefined, body: TaskWriteBody & { title: string }) {
   return request<TaskItem>('/api/tasks', { method: 'POST', token, body });
 }
 
-export function updateTask(
-  token: string | null | undefined,
-  id: string,
-  body: { title?: string; status?: string; priority?: string; progress?: number },
-) {
+export function updateTask(token: string | null | undefined, id: string, body: TaskWriteBody) {
   return request<TaskItem>(`/api/tasks/${id}`, { method: 'PATCH', token, body });
 }
 
@@ -153,6 +169,34 @@ export function fetchProjects(token?: string | null) {
   return request<ProjectItem[]>('/api/projects', { token });
 }
 
+export type ProjectWriteBody = {
+  name: string;
+  description?: string | null;
+  status?: string;
+  priority?: string;
+  type?: string;
+  parentId?: string | null;
+  startDate?: string | null;
+  dueDate?: string | null;
+  memberIds?: string[];
+};
+
+export function createProject(token: string | null | undefined, body: ProjectWriteBody) {
+  return request<ProjectItem>('/api/projects', { method: 'POST', token, body });
+}
+
+export function updateProject(
+  token: string | null | undefined,
+  id: string,
+  body: Partial<ProjectWriteBody>,
+) {
+  return request<ProjectItem>(`/api/projects/${id}`, { method: 'PATCH', token, body });
+}
+
+export function fetchUsers(token?: string | null, activeOnly = true) {
+  return request<OrgUser[]>(`/api/users${activeOnly ? '?active=true' : ''}`, { token });
+}
+
 export function fetchNotifications(token?: string | null) {
   return request<NotificationItem[]>('/api/notifications', { token });
 }
@@ -162,6 +206,14 @@ export function markNotificationsRead(token?: string | null) {
     method: 'PATCH',
     token,
     body: { readAll: true },
+  });
+}
+
+export function markNotificationRead(token: string | null | undefined, id: string) {
+  return request('/api/notifications', {
+    method: 'PATCH',
+    token,
+    body: { id },
   });
 }
 
@@ -176,6 +228,8 @@ export function createReminder(
     remindAt: string;
     type: 'custom' | 'task' | 'project';
     message?: string;
+    emailNotify?: boolean;
+    pushNotify?: boolean;
   },
 ) {
   return request<ReminderItem>('/api/reminders', { method: 'POST', token, body });
@@ -199,6 +253,48 @@ export function updateReminder(
 
 export function deleteReminder(token: string | null | undefined, id: string) {
   return request<{ success: boolean }>(`/api/reminders/${id}`, { method: 'DELETE', token });
+}
+
+export function fetchMyProfile(token?: string | null) {
+  return request<{
+    id: string;
+    pushNotificationEnabled?: boolean;
+    pushReminderEnabled?: boolean;
+    reminderEmailEnabled?: boolean;
+    notificationEmailEnabled?: boolean;
+  }>('/api/mobile/me', { token });
+}
+
+export function updateMyProfile(
+  token: string | null | undefined,
+  body: {
+    pushNotificationEnabled?: boolean;
+    pushReminderEnabled?: boolean;
+  },
+) {
+  return request('/api/mobile/me', { method: 'PATCH', token, body });
+}
+
+export function registerPushDevice(
+  token: string | null | undefined,
+  body: { token: string; platform: 'ios' | 'android'; appVersion?: string },
+) {
+  return request<{ ok: boolean }>('/api/mobile/push/register', {
+    method: 'POST',
+    token,
+    body,
+  });
+}
+
+export function unregisterPushDevice(
+  token: string | null | undefined,
+  fcmToken?: string,
+) {
+  return request<{ ok: boolean }>('/api/mobile/push/register', {
+    method: 'DELETE',
+    token,
+    body: fcmToken ? { token: fcmToken } : {},
+  });
 }
 
 export function fetchTeamClock(token?: string | null, date?: string) {

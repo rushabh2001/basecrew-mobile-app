@@ -1,70 +1,35 @@
-import React, { useState } from 'react';
-import {
-  ActivityIndicator,
-  Keyboard,
-  Pressable,
-  StyleSheet,
-  TextInput,
-  View,
-} from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import React from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { AppIcon } from './AppIcon';
 import { colors, radius, shadows, spacing } from '../theme';
 
 type Props = {
   placeholder?: string;
-  onSubmit: (title: string) => Promise<void> | void;
-  bottomInset?: number;
+  /** Kept for compatibility; expand path is preferred. */
+  onSubmit?: (title: string) => Promise<void> | void;
+  onExpand: (draftTitle?: string) => void;
+  /** Small gap above the tab bar (tab screens already sit above the bar). */
+  gapAboveTab?: number;
 };
 
+/**
+ * Floating add bar.
+ * Tab screen content already ends above the tab bar, so we only need a tiny gap
+ * (`gapAboveTab`) - do not add `useBottomTabBarHeight()` or the bar floats too high.
+ */
 export function QuickAddBar({
   placeholder = 'Add a task...',
-  onSubmit,
-  bottomInset = 0,
+  onExpand,
+  gapAboveTab = 12,
 }: Props) {
-  const insets = useSafeAreaInsets();
-  const [value, setValue] = useState('');
-  const [saving, setSaving] = useState(false);
-
-  async function submit() {
-    const title = value.trim();
-    if (!title || saving) return;
-    setSaving(true);
-    Keyboard.dismiss();
-    try {
-      await onSubmit(title);
-      setValue('');
-    } finally {
-      setSaving(false);
-    }
-  }
-
   return (
-    <View
-      style={[
-        styles.wrap,
-        shadows.float,
-        { paddingBottom: Math.max(insets.bottom, 8) + bottomInset },
-      ]}>
-      <View style={styles.bar}>
-        <Pressable style={styles.plusBtn} onPress={submit} disabled={saving || !value.trim()}>
-          {saving ? (
-            <ActivityIndicator color="#fff" size="small" />
-          ) : (
-            <AppIcon name="plus" size={20} color="#fff" />
-          )}
-        </Pressable>
-        <TextInput
-          value={value}
-          onChangeText={setValue}
-          placeholder={placeholder}
-          placeholderTextColor={colors.muted}
-          style={styles.input}
-          returnKeyType="done"
-          onSubmitEditing={submit}
-          editable={!saving}
-        />
-      </View>
+    <View style={[styles.wrap, shadows.float, { bottom: gapAboveTab }]}>
+      <Pressable style={styles.bar} onPress={() => onExpand('')}>
+        <View style={styles.plusBtn}>
+          <AppIcon name="plus" size={20} color="#fff" />
+        </View>
+        <Text style={styles.placeholder}>{placeholder}</Text>
+      </Pressable>
     </View>
   );
 }
@@ -74,9 +39,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 0,
     right: 0,
-    bottom: 0,
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
     backgroundColor: 'transparent',
   },
   bar: {
@@ -88,20 +51,20 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     paddingLeft: 6,
     paddingRight: spacing.md,
-    minHeight: 52,
+    minHeight: 48,
   },
   plusBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  input: {
+  placeholder: {
     flex: 1,
     fontSize: 16,
-    color: colors.text,
+    color: colors.muted,
     paddingHorizontal: spacing.sm,
     paddingVertical: 10,
   },

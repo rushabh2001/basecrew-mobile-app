@@ -70,6 +70,10 @@ Use the same credentials as the web app:
 
 ## Store publishing
 
+### Push notifications
+
+See **[PUSH-NOTIFICATIONS.md](./PUSH-NOTIFICATIONS.md)** for Firebase + opt-in Profile toggles (automatic alerts and custom reminders).
+
 ### Android (Play Store)
 
 1. Set `applicationId` / signing in `android/app/build.gradle` (already `com.basecrew.mobile`)

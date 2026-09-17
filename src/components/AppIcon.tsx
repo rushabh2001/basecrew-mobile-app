@@ -1,5 +1,6 @@
 import React from 'react';
 import { StyleProp, View, ViewStyle } from 'react-native';
+import Svg, { Circle, Line, Path, Polyline, Rect } from 'react-native-svg';
 
 export type AppIconName =
   | 'home'
@@ -14,6 +15,7 @@ export type AppIconName =
   | 'coffee'
   | 'rotate-ccw'
   | 'chevron-right'
+  | 'chevron-left'
   | 'x'
   | 'edit-2'
   | 'trash-2'
@@ -22,595 +24,303 @@ export type AppIconName =
   | 'briefcase'
   | 'activity'
   | 'map-pin'
-  | 'alert-circle';
+  | 'alert-circle'
+  | 'filter'
+  | 'flag'
+  | 'list'
+  | 'folder'
+  | 'hourglass'
+  | 'inbox';
 
 type Props = {
   name: AppIconName;
   size?: number;
   color?: string;
   style?: StyleProp<ViewStyle>;
+  strokeWidth?: number;
 };
 
-type DrawProps = { size: number; color: string };
+type DrawProps = { size: number; color: string; strokeWidth: number };
 
-function Box({ size, children, style }: { size: number; children: React.ReactNode; style?: StyleProp<ViewStyle> }) {
+function SvgIcon({
+  size,
+  color,
+  strokeWidth,
+  children,
+}: DrawProps & { children: React.ReactNode }) {
   return (
-    <View
-      style={[
-        {
-          width: size,
-          height: size,
-          alignItems: 'center',
-          justifyContent: 'center',
-        },
-        style,
-      ]}>
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
       {children}
-    </View>
+    </Svg>
   );
 }
 
-function IconHome({ size, color }: DrawProps) {
-  const w = size * 0.72;
+const stroke = (color: string, strokeWidth: number) => ({
+  stroke: color,
+  strokeWidth,
+  strokeLinecap: 'round' as const,
+  strokeLinejoin: 'round' as const,
+});
+
+function IconHome(p: DrawProps) {
   return (
-    <Box size={size}>
-      <View
-        style={{
-          width: 0,
-          height: 0,
-          borderLeftWidth: w * 0.42,
-          borderRightWidth: w * 0.42,
-          borderBottomWidth: w * 0.34,
-          borderLeftColor: 'transparent',
-          borderRightColor: 'transparent',
-          borderBottomColor: color,
-          marginBottom: -1,
-        }}
+    <SvgIcon {...p}>
+      <Path d="M3 10.5 12 3l9 7.5" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M5 10v10h14V10" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M10 20v-6h4v6" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconClock(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Circle cx="12" cy="12" r="9" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M12 7v5l3 2" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconCheckSquare(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Rect x="4" y="4" width="16" height="16" rx="3" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="m8 12 2.5 2.5L16 9" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconUsers(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M16 20v-1.5a3.5 3.5 0 0 0-3.5-3.5h-5A3.5 3.5 0 0 0 4 18.5V20" {...stroke(p.color, p.strokeWidth)} />
+      <Circle cx="9.5" cy="8" r="3" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M20 20v-1.2a3 3 0 0 0-2.2-2.9" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M16.5 5.2a3 3 0 0 1 0 5.6" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconUser(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Circle cx="12" cy="8" r="3.5" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M5.5 19.5c1.4-3 3.7-4.5 6.5-4.5s5.1 1.5 6.5 4.5" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconBell(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path
+        d="M6 16.5V11a6 6 0 1 1 12 0v5.5l1.2 1.8H4.8L6 16.5Z"
+        {...stroke(p.color, p.strokeWidth)}
       />
-      <View
-        style={{
-          width: w * 0.7,
-          height: w * 0.52,
-          borderWidth: 2,
-          borderTopWidth: 0,
-          borderColor: color,
-          borderBottomLeftRadius: 2,
-          borderBottomRightRadius: 2,
-        }}
+      <Path d="M10 19a2 2 0 0 0 4 0" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconPlus(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M12 5v14M5 12h14" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconLogIn(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M10 17H5V7h5" {...stroke(p.color, p.strokeWidth)} />
+      <Polyline points="14,16 18,12 14,8" {...stroke(p.color, p.strokeWidth)} />
+      <Line x1="18" y1="12" x2="9" y2="12" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconLogOut(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M14 17h5V7h-5" {...stroke(p.color, p.strokeWidth)} />
+      <Polyline points="10,16 6,12 10,8" {...stroke(p.color, p.strokeWidth)} />
+      <Line x1="6" y1="12" x2="15" y2="12" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconCoffee(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M5 9h11v6a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4V9Z" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M16 10h2.5a2.5 2.5 0 0 1 0 5H16" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M7 19h9" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconRotateCcw(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M3 12a9 9 0 1 0 3-6.7" {...stroke(p.color, p.strokeWidth)} />
+      <Polyline points="3,4 3,9 8,9" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconChevronRight(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Polyline points="9,6 15,12 9,18" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconChevronLeft(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Polyline points="15,6 9,12 15,18" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconX(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M6 6l12 12M18 6 6 18" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconEdit2(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M12 20h8" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L8 18l-4 1 1-4 11.5-11.5Z" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconTrash2(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M4 7h16" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M9 7V5h6v2" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M7 7l1 12h8l1-12" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconCheck(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="m5 12 4.5 4.5L19 7" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconCalendar(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Rect x="4" y="5" width="16" height="15" rx="2" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M4 10h16M8 3v4M16 3v4" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconBriefcase(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Rect x="3" y="8" width="18" height="12" rx="2" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M3 13h18" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconActivity(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Polyline points="3,14 8,14 10.5,6 13.5,18 16,10 21,10" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconMapPin(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M12 21s-6-5.2-6-10a6 6 0 1 1 12 0c0 4.8-6 10-6 10Z" {...stroke(p.color, p.strokeWidth)} />
+      <Circle cx="12" cy="11" r="2.2" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconAlertCircle(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Circle cx="12" cy="12" r="9" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M12 8v5" {...stroke(p.color, p.strokeWidth)} />
+      <Circle cx="12" cy="16.5" r="0.8" fill={p.color} />
+    </SvgIcon>
+  );
+}
+
+function IconFilter(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M4 5h16l-6 7v5l-4 2v-7L4 5Z" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconFlag(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M5 21V4" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M5 4h11l-1.5 4L16 12H5" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
+  );
+}
+
+function IconList(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path d="M9 7h11M9 12h11M9 17h11" {...stroke(p.color, p.strokeWidth)} />
+      <Circle cx="5" cy="7" r="1.2" fill={p.color} />
+      <Circle cx="5" cy="12" r="1.2" fill={p.color} />
+      <Circle cx="5" cy="17" r="1.2" fill={p.color} />
+    </SvgIcon>
+  );
+}
+
+function IconFolder(p: DrawProps) {
+  return (
+    <SvgIcon {...p}>
+      <Path
+        d="M3 8.5A2.5 2.5 0 0 1 5.5 6H9l2 2h7.5A2.5 2.5 0 0 1 21 10.5v7A2.5 2.5 0 0 1 18.5 20h-13A2.5 2.5 0 0 1 3 17.5v-9Z"
+        {...stroke(p.color, p.strokeWidth)}
       />
-    </Box>
+    </SvgIcon>
   );
 }
 
-function IconClock({ size, color }: DrawProps) {
-  const d = size * 0.78;
+function IconHourglass(p: DrawProps) {
   return (
-    <Box size={size}>
-      <View
-        style={{
-          width: d,
-          height: d,
-          borderRadius: d / 2,
-          borderWidth: 2,
-          borderColor: color,
-          alignItems: 'center',
-          justifyContent: 'flex-start',
-          paddingTop: d * 0.22,
-        }}>
-        <View style={{ width: 2, height: d * 0.28, backgroundColor: color, borderRadius: 1 }} />
-        <View
-          style={{
-            position: 'absolute',
-            top: d * 0.46,
-            left: d * 0.46,
-            width: d * 0.24,
-            height: 2,
-            backgroundColor: color,
-            borderRadius: 1,
-          }}
-        />
-      </View>
-    </Box>
+    <SvgIcon {...p}>
+      <Path d="M6 3h12M6 21h12" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M7 3c0 4 5 5 5 9s-5 5-5 9" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M17 3c0 4-5 5-5 9s5 5 5 9" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
   );
 }
 
-function IconCheckSquare({ size, color }: DrawProps) {
-  const s = size * 0.72;
+function IconInbox(p: DrawProps) {
   return (
-    <Box size={size}>
-      <View
-        style={{
-          width: s,
-          height: s,
-          borderRadius: 3,
-          borderWidth: 2,
-          borderColor: color,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-        <View
-          style={{
-            width: s * 0.42,
-            height: s * 0.22,
-            borderLeftWidth: 2,
-            borderBottomWidth: 2,
-            borderColor: color,
-            transform: [{ rotate: '-45deg' }],
-            marginTop: -2,
-          }}
-        />
-      </View>
-    </Box>
-  );
-}
-
-function IconUser({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View
-        style={{
-          width: size * 0.34,
-          height: size * 0.34,
-          borderRadius: size * 0.17,
-          borderWidth: 2,
-          borderColor: color,
-          marginBottom: 3,
-        }}
-      />
-      <View
-        style={{
-          width: size * 0.58,
-          height: size * 0.3,
-          borderTopLeftRadius: size * 0.3,
-          borderTopRightRadius: size * 0.3,
-          borderWidth: 2,
-          borderBottomWidth: 0,
-          borderColor: color,
-        }}
-      />
-    </Box>
-  );
-}
-
-function IconUsers({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View style={{ width: size, height: size }}>
-        <View
-          style={{
-            position: 'absolute',
-            left: size * 0.12,
-            top: size * 0.12,
-            width: size * 0.28,
-            height: size * 0.28,
-            borderRadius: size * 0.14,
-            borderWidth: 1.8,
-            borderColor: color,
-          }}
-        />
-        <View
-          style={{
-            position: 'absolute',
-            left: size * 0.48,
-            top: size * 0.12,
-            width: size * 0.28,
-            height: size * 0.28,
-            borderRadius: size * 0.14,
-            borderWidth: 1.8,
-            borderColor: color,
-          }}
-        />
-        <View
-          style={{
-            position: 'absolute',
-            bottom: size * 0.12,
-            left: size * 0.08,
-            width: size * 0.36,
-            height: size * 0.28,
-            borderTopLeftRadius: size * 0.18,
-            borderTopRightRadius: size * 0.18,
-            borderWidth: 1.8,
-            borderBottomWidth: 0,
-            borderColor: color,
-          }}
-        />
-        <View
-          style={{
-            position: 'absolute',
-            bottom: size * 0.12,
-            right: size * 0.08,
-            width: size * 0.36,
-            height: size * 0.28,
-            borderTopLeftRadius: size * 0.18,
-            borderTopRightRadius: size * 0.18,
-            borderWidth: 1.8,
-            borderBottomWidth: 0,
-            borderColor: color,
-          }}
-        />
-      </View>
-    </Box>
-  );
-}
-
-function IconBell({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View
-        style={{
-          width: size * 0.42,
-          height: size * 0.38,
-          borderTopLeftRadius: size * 0.22,
-          borderTopRightRadius: size * 0.22,
-          borderWidth: 2,
-          borderBottomWidth: 0,
-          borderColor: color,
-          marginTop: size * 0.08,
-        }}
-      />
-      <View
-        style={{
-          width: size * 0.55,
-          height: 2.5,
-          backgroundColor: color,
-          borderRadius: 2,
-        }}
-      />
-      <View
-        style={{
-          width: size * 0.14,
-          height: size * 0.1,
-          borderBottomLeftRadius: 6,
-          borderBottomRightRadius: 6,
-          borderWidth: 1.5,
-          borderTopWidth: 0,
-          borderColor: color,
-          marginTop: 1,
-        }}
-      />
-    </Box>
-  );
-}
-
-function IconPlus({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View style={{ position: 'absolute', width: size * 0.7, height: 2.5, backgroundColor: color, borderRadius: 2 }} />
-      <View style={{ position: 'absolute', width: 2.5, height: size * 0.7, backgroundColor: color, borderRadius: 2 }} />
-    </Box>
-  );
-}
-
-function IconCheck({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View
-        style={{
-          width: size * 0.48,
-          height: size * 0.26,
-          borderLeftWidth: 2.5,
-          borderBottomWidth: 2.5,
-          borderColor: color,
-          transform: [{ rotate: '-45deg' }],
-          marginTop: -size * 0.08,
-        }}
-      />
-    </Box>
-  );
-}
-
-function IconX({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View
-        style={{
-          position: 'absolute',
-          width: size * 0.7,
-          height: 2.5,
-          backgroundColor: color,
-          borderRadius: 2,
-          transform: [{ rotate: '45deg' }],
-        }}
-      />
-      <View
-        style={{
-          position: 'absolute',
-          width: size * 0.7,
-          height: 2.5,
-          backgroundColor: color,
-          borderRadius: 2,
-          transform: [{ rotate: '-45deg' }],
-        }}
-      />
-    </Box>
-  );
-}
-
-function IconChevronRight({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View
-        style={{
-          width: size * 0.32,
-          height: size * 0.32,
-          borderTopWidth: 2.5,
-          borderRightWidth: 2.5,
-          borderColor: color,
-          transform: [{ rotate: '45deg' }],
-          marginLeft: -size * 0.08,
-        }}
-      />
-    </Box>
-  );
-}
-
-function IconLogIn({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
-        <View
-          style={{
-            width: 0,
-            height: 0,
-            borderTopWidth: size * 0.16,
-            borderBottomWidth: size * 0.16,
-            borderLeftWidth: size * 0.22,
-            borderTopColor: 'transparent',
-            borderBottomColor: 'transparent',
-            borderLeftColor: color,
-          }}
-        />
-        <View
-          style={{
-            width: size * 0.38,
-            height: size * 0.55,
-            borderWidth: 2,
-            borderLeftWidth: 0,
-            borderColor: color,
-            borderTopRightRadius: 3,
-            borderBottomRightRadius: 3,
-          }}
-        />
-      </View>
-    </Box>
-  );
-}
-
-function IconLogOut({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 3 }}>
-        <View
-          style={{
-            width: size * 0.38,
-            height: size * 0.55,
-            borderWidth: 2,
-            borderRightWidth: 0,
-            borderColor: color,
-            borderTopLeftRadius: 3,
-            borderBottomLeftRadius: 3,
-          }}
-        />
-        <View
-          style={{
-            width: 0,
-            height: 0,
-            borderTopWidth: size * 0.16,
-            borderBottomWidth: size * 0.16,
-            borderLeftWidth: size * 0.22,
-            borderTopColor: 'transparent',
-            borderBottomColor: 'transparent',
-            borderLeftColor: color,
-          }}
-        />
-      </View>
-    </Box>
-  );
-}
-
-function IconCoffee({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-        <View
-          style={{
-            width: size * 0.48,
-            height: size * 0.42,
-            borderWidth: 2,
-            borderColor: color,
-            borderBottomLeftRadius: 6,
-            borderBottomRightRadius: 6,
-            marginTop: size * 0.12,
-          }}
-        />
-        <View
-          style={{
-            width: size * 0.16,
-            height: size * 0.22,
-            borderWidth: 2,
-            borderLeftWidth: 0,
-            borderColor: color,
-            borderTopRightRadius: 8,
-            borderBottomRightRadius: 8,
-            marginTop: size * 0.18,
-          }}
-        />
-      </View>
-    </Box>
-  );
-}
-
-function IconRotateCcw({ size, color }: DrawProps) {
-  const d = size * 0.62;
-  return (
-    <Box size={size}>
-      <View
-        style={{
-          width: d,
-          height: d,
-          borderRadius: d / 2,
-          borderWidth: 2,
-          borderColor: color,
-          borderTopColor: 'transparent',
-        }}
-      />
-      <View
-        style={{
-          position: 'absolute',
-          top: size * 0.12,
-          left: size * 0.18,
-          width: 0,
-          height: 0,
-          borderTopWidth: size * 0.12,
-          borderBottomWidth: size * 0.12,
-          borderRightWidth: size * 0.16,
-          borderTopColor: 'transparent',
-          borderBottomColor: 'transparent',
-          borderRightColor: color,
-        }}
-      />
-    </Box>
-  );
-}
-
-function IconCalendar({ size, color }: DrawProps) {
-  const s = size * 0.72;
-  return (
-    <Box size={size}>
-      <View style={{ width: s, height: s * 0.85, borderWidth: 2, borderColor: color, borderRadius: 3 }}>
-        <View style={{ height: s * 0.22, backgroundColor: color, opacity: 0.25 }} />
-        <View style={{ position: 'absolute', top: -3, left: s * 0.18, width: 2, height: 8, backgroundColor: color }} />
-        <View style={{ position: 'absolute', top: -3, right: s * 0.18, width: 2, height: 8, backgroundColor: color }} />
-      </View>
-    </Box>
-  );
-}
-
-function IconBriefcase({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View
-        style={{
-          width: size * 0.28,
-          height: size * 0.16,
-          borderWidth: 2,
-          borderBottomWidth: 0,
-          borderColor: color,
-          borderTopLeftRadius: 3,
-          borderTopRightRadius: 3,
-          marginBottom: -1,
-        }}
-      />
-      <View
-        style={{
-          width: size * 0.72,
-          height: size * 0.48,
-          borderWidth: 2,
-          borderColor: color,
-          borderRadius: 3,
-        }}
-      />
-    </Box>
-  );
-}
-
-function IconActivity({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 3, height: size * 0.6 }}>
-        <View style={{ width: 3, height: size * 0.28, backgroundColor: color, borderRadius: 1 }} />
-        <View style={{ width: 3, height: size * 0.48, backgroundColor: color, borderRadius: 1 }} />
-        <View style={{ width: 3, height: size * 0.36, backgroundColor: color, borderRadius: 1 }} />
-        <View style={{ width: 3, height: size * 0.55, backgroundColor: color, borderRadius: 1 }} />
-      </View>
-    </Box>
-  );
-}
-
-function IconMapPin({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View
-        style={{
-          width: size * 0.42,
-          height: size * 0.42,
-          borderRadius: size * 0.21,
-          borderWidth: 2,
-          borderColor: color,
-          marginBottom: -size * 0.08,
-        }}
-      />
-      <View
-        style={{
-          width: 0,
-          height: 0,
-          borderLeftWidth: size * 0.18,
-          borderRightWidth: size * 0.18,
-          borderTopWidth: size * 0.28,
-          borderLeftColor: 'transparent',
-          borderRightColor: 'transparent',
-          borderTopColor: color,
-        }}
-      />
-    </Box>
-  );
-}
-
-function IconAlertCircle({ size, color }: DrawProps) {
-  const d = size * 0.78;
-  return (
-    <Box size={size}>
-      <View
-        style={{
-          width: d,
-          height: d,
-          borderRadius: d / 2,
-          borderWidth: 2,
-          borderColor: color,
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 2,
-        }}>
-        <View style={{ width: 2.5, height: d * 0.28, backgroundColor: color, borderRadius: 1 }} />
-        <View style={{ width: 3, height: 3, borderRadius: 1.5, backgroundColor: color }} />
-      </View>
-    </Box>
-  );
-}
-
-function IconEdit2({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View
-        style={{
-          width: size * 0.42,
-          height: size * 0.42,
-          borderWidth: 2,
-          borderColor: color,
-          borderRadius: 2,
-          transform: [{ rotate: '12deg' }],
-        }}
-      />
-    </Box>
-  );
-}
-
-function IconTrash2({ size, color }: DrawProps) {
-  return (
-    <Box size={size}>
-      <View style={{ width: size * 0.4, height: 2.5, backgroundColor: color, borderRadius: 1, marginBottom: 2 }} />
-      <View
-        style={{
-          width: size * 0.5,
-          height: size * 0.48,
-          borderWidth: 2,
-          borderTopWidth: 0,
-          borderColor: color,
-          borderBottomLeftRadius: 3,
-          borderBottomRightRadius: 3,
-        }}
-      />
-    </Box>
+    <SvgIcon {...p}>
+      <Path d="M4 13 6.5 5h11L20 13v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-5Z" {...stroke(p.color, p.strokeWidth)} />
+      <Path d="M4 13h4.5l1.5 2h4l1.5-2H20" {...stroke(p.color, p.strokeWidth)} />
+    </SvgIcon>
   );
 }
 
@@ -627,6 +337,7 @@ const ICONS: Record<AppIconName, (p: DrawProps) => React.ReactElement> = {
   coffee: IconCoffee,
   'rotate-ccw': IconRotateCcw,
   'chevron-right': IconChevronRight,
+  'chevron-left': IconChevronLeft,
   x: IconX,
   'edit-2': IconEdit2,
   'trash-2': IconTrash2,
@@ -636,13 +347,25 @@ const ICONS: Record<AppIconName, (p: DrawProps) => React.ReactElement> = {
   activity: IconActivity,
   'map-pin': IconMapPin,
   'alert-circle': IconAlertCircle,
+  filter: IconFilter,
+  flag: IconFlag,
+  list: IconList,
+  folder: IconFolder,
+  hourglass: IconHourglass,
+  inbox: IconInbox,
 };
 
-export function AppIcon({ name, size = 22, color = '#0F172A', style }: Props) {
+export function AppIcon({
+  name,
+  size = 22,
+  color = '#0F172A',
+  style,
+  strokeWidth = 1.85,
+}: Props) {
   const Icon = ICONS[name] ?? IconHome;
   return (
     <View style={style} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
-      <Icon size={size} color={color} />
+      <Icon size={size} color={color} strokeWidth={strokeWidth} />
     </View>
   );
 }

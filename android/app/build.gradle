@@ -117,3 +117,8 @@ dependencies {
         implementation jscFlavor
     }
 }
+
+// Only apply when Firebase config is present so local builds without it still work.
+if (file("google-services.json").exists()) {
+    apply plugin: "com.google.gms.google-services"
+}

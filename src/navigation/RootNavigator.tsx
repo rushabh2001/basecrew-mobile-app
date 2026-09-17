@@ -32,6 +32,7 @@ function MainTabs() {
           ...shadows.sm,
         },
         tabBarLabelStyle: { fontSize: 11, fontWeight: '600', marginTop: 2 },
+        tabBarIconStyle: { marginTop: 2 },
         animation: 'shift',
       }}>
       <Tab.Screen
@@ -39,9 +40,9 @@ function MainTabs() {
         component={HomeScreen}
         options={{
           tabBarLabel: 'Today',
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ color, focused }) => (
             <View style={{ opacity: focused ? 1 : 0.85 }}>
-              <AppIcon name="home" size={size - 1} color={color} />
+              <AppIcon name="home" size={24} color={color} />
             </View>
           ),
         }}
@@ -51,9 +52,9 @@ function MainTabs() {
         component={TasksScreen}
         options={{
           title: 'Tasks',
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ color, focused }) => (
             <View style={{ opacity: focused ? 1 : 0.85 }}>
-              <AppIcon name="check-square" size={size - 1} color={color} />
+              <AppIcon name="check-square" size={24} color={color} />
             </View>
           ),
         }}
@@ -62,9 +63,9 @@ function MainTabs() {
         name="Team"
         component={TeamScreen}
         options={{
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ color, focused }) => (
             <View style={{ opacity: focused ? 1 : 0.85 }}>
-              <AppIcon name="users" size={size - 1} color={color} />
+              <AppIcon name="users" size={24} color={color} />
             </View>
           ),
         }}
@@ -73,9 +74,9 @@ function MainTabs() {
         name="Profile"
         component={ProfileScreen}
         options={{
-          tabBarIcon: ({ color, size, focused }) => (
+          tabBarIcon: ({ color, focused }) => (
             <View style={{ opacity: focused ? 1 : 0.85 }}>
-              <AppIcon name="user" size={size - 1} color={color} />
+              <AppIcon name="user" size={24} color={color} />
             </View>
           ),
         }}

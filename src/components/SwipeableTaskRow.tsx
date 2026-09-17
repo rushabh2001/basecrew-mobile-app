@@ -15,6 +15,7 @@ import { colors, radius, spacing } from '../theme';
 type Props = {
   task: TaskItem;
   onToggle: (task: TaskItem) => void;
+  onPress?: (task: TaskItem) => void;
   showProject?: boolean;
 };
 
@@ -26,18 +27,31 @@ function priorityAccent(priority?: string | null) {
   return 'transparent';
 }
 
-export function SwipeableTaskRow({ task, onToggle, showProject = true }: Props) {
+export function SwipeableTaskRow({
+  task,
+  onToggle,
+  onPress,
+  showProject = true,
+}: Props) {
   const translateX = useRef(new Animated.Value(0)).current;
   const completed = task.status === 'completed';
+  const tapStart = useRef({ x: 0, y: 0, t: 0 });
 
   const pan = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, g) =>
         !completed && Math.abs(g.dx) > 8 && Math.abs(g.dx) > Math.abs(g.dy),
+      onPanResponderGrant: evt => {
+        tapStart.current = {
+          x: evt.nativeEvent.pageX,
+          y: evt.nativeEvent.pageY,
+          t: Date.now(),
+        };
+      },
       onPanResponderMove: (_, g) => {
         if (g.dx > 0) translateX.setValue(Math.min(g.dx, 100));
       },
-      onPanResponderRelease: (_, g) => {
+      onPanResponderRelease: (evt, g) => {
         if (g.dx >= SWIPE_THRESHOLD) {
           Animated.timing(translateX, {
             toValue: 120,
@@ -47,12 +61,19 @@ export function SwipeableTaskRow({ task, onToggle, showProject = true }: Props) 
             translateX.setValue(0);
             onToggle(task);
           });
-        } else {
-          Animated.spring(translateX, {
-            toValue: 0,
-            useNativeDriver: true,
-            friction: 7,
-          }).start();
+          return;
+        }
+        Animated.spring(translateX, {
+          toValue: 0,
+          useNativeDriver: true,
+          friction: 7,
+        }).start();
+
+        const dx = Math.abs(evt.nativeEvent.pageX - tapStart.current.x);
+        const dy = Math.abs(evt.nativeEvent.pageY - tapStart.current.y);
+        const dt = Date.now() - tapStart.current.t;
+        if (onPress && dx < 8 && dy < 8 && dt < 280 && Math.abs(g.dx) < 8) {
+          onPress(task);
         }
       },
     }),
@@ -103,7 +124,7 @@ export function SwipeableTaskRow({ task, onToggle, showProject = true }: Props) 
                 </Text>
               </View>
             ) : null}
-            {task.status === 'in_progress' && !completed ? (
+            {task.status === 'in-progress' && !completed ? (
               <View style={[styles.chip, styles.chipProgress]}>
                 <Text style={[styles.chipText, { color: colors.primaryDeep }]}>
                   In progress

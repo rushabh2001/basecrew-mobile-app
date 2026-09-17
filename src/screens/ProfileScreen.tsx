@@ -1,10 +1,24 @@
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Alert,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import * as api from '../api/client';
 import { useAuth } from '../auth/AuthContext';
 import { ScreenHeader } from '../components/ScreenHeader';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { API_BASE_URL } from '../config';
+import {
+  enableAndRegisterPush,
+  isPushSdkAvailable,
+  startPushTokenSync,
+  unregisterPush,
+} from '../push/pushNotifications';
 import { colors, radius, spacing } from '../theme';
 
 function roleLabel(role?: string | null) {
@@ -15,7 +29,94 @@ function roleLabel(role?: string | null) {
 }
 
 export function ProfileScreen() {
-  const { user, signOut } = useAuth();
+  const { user, token, signOut } = useAuth();
+  const [loadingPrefs, setLoadingPrefs] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [pushNotifications, setPushNotifications] = useState(false);
+  const [pushReminders, setPushReminders] = useState(false);
+
+  const loadPrefs = useCallback(async () => {
+    if (!token) return;
+    setLoadingPrefs(true);
+    try {
+      const profile = await api.fetchMyProfile(token);
+      setPushNotifications(!!profile.pushNotificationEnabled);
+      setPushReminders(!!profile.pushReminderEnabled);
+    } catch {
+      // keep defaults
+    } finally {
+      setLoadingPrefs(false);
+    }
+  }, [token]);
+
+  useEffect(() => {
+    void loadPrefs();
+  }, [loadPrefs]);
+
+  useEffect(() => {
+    if (!token || (!pushNotifications && !pushReminders)) return;
+    return startPushTokenSync(token);
+  }, [token, pushNotifications, pushReminders]);
+
+  async function setPushPref(
+    field: 'pushNotificationEnabled' | 'pushReminderEnabled',
+    next: boolean,
+  ) {
+    if (!token) return;
+    const previousNotifications = pushNotifications;
+    const previousReminders = pushReminders;
+
+    if (field === 'pushNotificationEnabled') setPushNotifications(next);
+    else setPushReminders(next);
+
+    setSaving(true);
+    try {
+      if (next) {
+        if (!isPushSdkAvailable()) {
+          Alert.alert(
+            'Push not configured',
+            'Firebase is not set up in this build yet. Add google-services.json / GoogleService-Info.plist, then rebuild.',
+          );
+          if (field === 'pushNotificationEnabled') setPushNotifications(previousNotifications);
+          else setPushReminders(previousReminders);
+          return;
+        }
+        const result = await enableAndRegisterPush(token);
+        if (!result.ok) {
+          const detail =
+            result.reason === 'denied'
+              ? 'Allow notifications in iOS Settings → BaseCrew to receive alerts.'
+              : result.reason === 'api_missing'
+                ? result.message ||
+                  'Push API is not on the server yet. Deploy the latest web app, then try again.'
+                : result.message ||
+                  'Could not register this device for push. Check Firebase / APNs setup and try again.';
+          Alert.alert(
+            result.reason === 'denied' ? 'Permission needed' : 'Could not enable alerts',
+            detail,
+          );
+          if (field === 'pushNotificationEnabled') setPushNotifications(previousNotifications);
+          else setPushReminders(previousReminders);
+          return;
+        }
+      }
+
+      await api.updateMyProfile(token, { [field]: next });
+
+      const notificationsOn =
+        field === 'pushNotificationEnabled' ? next : previousNotifications;
+      const remindersOn = field === 'pushReminderEnabled' ? next : previousReminders;
+      if (!notificationsOn && !remindersOn) {
+        await unregisterPush(token);
+      }
+    } catch (e) {
+      if (field === 'pushNotificationEnabled') setPushNotifications(previousNotifications);
+      else setPushReminders(previousReminders);
+      Alert.alert('Could not update', e instanceof Error ? e.message : 'Try again');
+    } finally {
+      setSaving(false);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
@@ -33,6 +134,45 @@ export function ProfileScreen() {
             <Text style={styles.roleText}>{roleLabel(user?.role)}</Text>
           </View>
         </View>
+
+        <View style={styles.card}>
+          <Text style={styles.sectionTitle}>Mobile alerts</Text>
+          <Text style={styles.sectionHint}>
+            Turn these on to get push alerts on this phone. Automatic alerts cover task and team
+            notifications. Reminder alerts cover your custom inbox reminders.
+          </Text>
+          {loadingPrefs ? (
+            <ActivityIndicator color={colors.primary} style={{ marginTop: spacing.md }} />
+          ) : (
+            <>
+              <View style={styles.row}>
+                <View style={styles.rowText}>
+                  <Text style={styles.rowTitle}>Automatic notifications</Text>
+                  <Text style={styles.rowMeta}>Tasks, deadlines, assignments</Text>
+                </View>
+                <Switch
+                  value={pushNotifications}
+                  disabled={saving}
+                  onValueChange={v => void setPushPref('pushNotificationEnabled', v)}
+                  trackColor={{ true: colors.primary, false: colors.border }}
+                />
+              </View>
+              <View style={styles.row}>
+                <View style={styles.rowText}>
+                  <Text style={styles.rowTitle}>Custom reminders</Text>
+                  <Text style={styles.rowMeta}>Push when a reminder is due</Text>
+                </View>
+                <Switch
+                  value={pushReminders}
+                  disabled={saving}
+                  onValueChange={v => void setPushPref('pushReminderEnabled', v)}
+                  trackColor={{ true: colors.primary, false: colors.border }}
+                />
+              </View>
+            </>
+          )}
+        </View>
+
         <Text style={styles.api}>Connected to {API_BASE_URL.replace(/^https?:\/\//, '')}</Text>
         <PrimaryButton label="Sign out" variant="danger" onPress={() => signOut()} />
       </View>
@@ -43,12 +183,6 @@ export function ProfileScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   container: { padding: spacing.lg, flex: 1 },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: colors.navy,
-    marginBottom: spacing.lg,
-  },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
@@ -78,5 +212,18 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
   roleText: { color: colors.primaryDeep, fontWeight: '700', fontSize: 12 },
+  sectionTitle: { fontSize: 16, fontWeight: '700', color: colors.navy },
+  sectionHint: { color: colors.muted, fontSize: 13, marginTop: 6, lineHeight: 18 },
+  row: {
+    width: '100%',
+    marginTop: spacing.md,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+  },
+  rowText: { flex: 1 },
+  rowTitle: { fontWeight: '600', color: colors.text },
+  rowMeta: { color: colors.muted, fontSize: 12, marginTop: 2 },
   api: { color: colors.muted, fontSize: 12, marginBottom: spacing.lg },
 });

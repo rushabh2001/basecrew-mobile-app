@@ -10,6 +10,7 @@ import * as api from '../api/client';
 import { setApiTokenGetter, setApiUnauthorizedHandler } from '../api/client';
 import type { MobileUser } from '../api/types';
 import { clearSession, loadSession, saveSession } from './storage';
+import { unregisterPush } from '../push/pushNotifications';
 
 function normalizeUser(raw: any): MobileUser | null {
   if (!raw?.id) return null;
@@ -44,10 +45,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<MobileUser | null>(null);
 
   const signOut = useCallback(async () => {
+    try {
+      await unregisterPush(token);
+    } catch {
+      // ignore
+    }
     await clearSession();
     setToken(null);
     setUser(null);
-  }, []);
+  }, [token]);
 
   useEffect(() => {
     setApiTokenGetter(() => token);

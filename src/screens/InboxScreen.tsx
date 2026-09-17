@@ -1,10 +1,11 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import {
   Alert,
   FlatList,
   Modal,
   Pressable,
   RefreshControl,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
@@ -16,6 +17,8 @@ import * as api from '../api/client';
 import type { NotificationItem, ReminderItem } from '../api/types';
 import { useAuth } from '../auth/AuthContext';
 import { AppIcon } from '../components/AppIcon';
+import { AlertCard } from '../components/AlertCard';
+import { DateTimeField } from '../components/DateTimeField';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { SegmentedControl } from '../components/SegmentedControl';
 import { colors, radius, spacing } from '../theme';
@@ -44,7 +47,7 @@ export function InboxScreen() {
   const [editItem, setEditItem] = useState<ReminderItem | null>(null);
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
-  const [remindAt, setRemindAt] = useState('');
+  const [remindAtDate, setRemindAtDate] = useState(new Date(Date.now() + 60 * 60 * 1000));
   const [saving, setSaving] = useState(false);
 
   const load = useCallback(async () => {
@@ -70,12 +73,44 @@ export function InboxScreen() {
     }, [load]),
   );
 
+  const sortedReminders = useMemo(
+    () =>
+      [...reminders].sort(
+        (a, b) => new Date(b.remindAt).getTime() - new Date(a.remindAt).getTime(),
+      ),
+    [reminders],
+  );
+
+  const sortedNotifications = useMemo(
+    () =>
+      [...notifications].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+      ),
+    [notifications],
+  );
+
+  async function markOneRead(item: NotificationItem) {
+    if (!token || item.read) return;
+    setNotifications(prev =>
+      prev.map(n => (n.id === item.id ? { ...n, read: true } : n)),
+    );
+    try {
+      await api.markNotificationRead(token, item.id);
+    } catch {
+      setNotifications(prev =>
+        prev.map(n => (n.id === item.id ? { ...n, read: false } : n)),
+      );
+    }
+  }
+
+  const data = tab === 'Reminders' ? sortedReminders : sortedNotifications;
+  const unreadCount = notifications.filter(n => !n.read).length;
+
   function openCreate() {
     setEditItem(null);
     setTitle('');
     setMessage('');
-    const d = new Date(Date.now() + 60 * 60 * 1000);
-    setRemindAt(d.toISOString().slice(0, 16));
+    setRemindAtDate(new Date(Date.now() + 60 * 60 * 1000));
     setCreateOpen(true);
   }
 
@@ -83,15 +118,15 @@ export function InboxScreen() {
     setEditItem(item);
     setTitle(item.title);
     setMessage(item.message || '');
-    setRemindAt(new Date(item.remindAt).toISOString().slice(0, 16));
+    setRemindAtDate(new Date(item.remindAt));
     setCreateOpen(true);
   }
 
   async function saveReminder() {
-    if (!token || !title.trim() || !remindAt) return;
+    if (!token || !title.trim()) return;
     setSaving(true);
     try {
-      const iso = new Date(remindAt).toISOString();
+      const iso = remindAtDate.toISOString();
       if (editItem) {
         await api.updateReminder(token, editItem.id, {
           title: title.trim(),
@@ -104,6 +139,7 @@ export function InboxScreen() {
           message: message.trim() || undefined,
           remindAt: iso,
           type: 'custom',
+          pushNotify: true,
         });
       }
       setCreateOpen(false);
@@ -144,14 +180,13 @@ export function InboxScreen() {
     ]);
   }
 
-  const data = tab === 'Reminders' ? reminders : notifications;
-
   return (
     <SafeAreaView style={styles.safe} edges={['top']}>
       <FlatList
         data={data as any[]}
         keyExtractor={item => item.id}
         contentContainerStyle={styles.list}
+        ItemSeparatorComponent={() => <View style={styles.sep} />}
         refreshControl={<RefreshControl refreshing={loading} onRefresh={load} />}
         ListHeaderComponent={
           <View style={styles.header}>
@@ -167,11 +202,14 @@ export function InboxScreen() {
                   <Pressable
                     style={styles.ghostBtn}
                     onPress={async () => {
-                      if (!token) return;
+                      if (!token || unreadCount === 0) return;
+                      setNotifications(prev => prev.map(n => ({ ...n, read: true })));
                       await api.markNotificationsRead(token);
                       await load();
                     }}>
-                    <Text style={styles.ghostLabel}>Mark all read</Text>
+                    <Text style={styles.ghostLabel}>
+                      {unreadCount > 0 ? `Mark all read (${unreadCount})` : 'All read'}
+                    </Text>
                   </Pressable>
                 )}
                 <Pressable
@@ -192,9 +230,19 @@ export function InboxScreen() {
         }
         ListEmptyComponent={
           !loading ? (
-            <Text style={styles.empty}>
-              {tab === 'Reminders' ? 'No reminders yet.' : "You're all caught up."}
-            </Text>
+            tab === 'Reminders' ? (
+              <Text style={styles.empty}>No reminders yet.</Text>
+            ) : (
+              <View style={styles.emptyWrap}>
+                <View style={styles.emptyIcon}>
+                  <AppIcon name="inbox" size={28} color={colors.primaryDeep} />
+                </View>
+                <Text style={styles.emptyTitle}>You're all caught up</Text>
+                <Text style={styles.emptySub}>
+                  New task, deadline, and team alerts will show up here.
+                </Text>
+              </View>
+            )
           ) : null
         }
         renderItem={({ item }) =>
@@ -206,9 +254,7 @@ export function InboxScreen() {
               ) : null}
               <Text style={styles.meta}>{formatWhen((item as ReminderItem).remindAt)}</Text>
               <View style={styles.actions}>
-                <Pressable
-                  style={styles.chip}
-                  onPress={() => toggleDone(item as ReminderItem)}>
+                <Pressable style={styles.chip} onPress={() => toggleDone(item as ReminderItem)}>
                   <Text style={styles.chipText}>
                     {(item as ReminderItem).isDone ? 'Reopen' : 'Complete'}
                   </Text>
@@ -224,60 +270,55 @@ export function InboxScreen() {
               </View>
             </View>
           ) : (
-            <View
-              style={[
-                styles.card,
-                !(item as NotificationItem).read && styles.unread,
-              ]}>
-              <Text style={styles.cardTitle}>{(item as NotificationItem).title}</Text>
-              <Text style={styles.msg}>{(item as NotificationItem).message}</Text>
-              <Text style={styles.meta}>
-                {formatWhen((item as NotificationItem).createdAt)}
-              </Text>
-            </View>
+            <AlertCard
+              item={item as NotificationItem}
+              onPress={markOneRead}
+            />
           )
         }
       />
 
       <Modal visible={createOpen} animationType="slide" transparent>
         <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle}>
-              {editItem ? 'Edit reminder' : 'Custom reminder'}
-            </Text>
-            <Text style={styles.label}>Title</Text>
-            <TextInput
-              value={title}
-              onChangeText={setTitle}
-              placeholder="Follow up with client"
-              placeholderTextColor={colors.muted}
-              style={styles.input}
-            />
-            <Text style={styles.label}>Notes (optional)</Text>
-            <TextInput
-              value={message}
-              onChangeText={setMessage}
-              placeholder="Details"
-              placeholderTextColor={colors.muted}
-              style={styles.input}
-            />
-            <Text style={styles.label}>Remind at (YYYY-MM-DDTHH:mm)</Text>
-            <TextInput
-              value={remindAt}
-              onChangeText={setRemindAt}
-              autoCapitalize="none"
-              placeholder="2026-08-31T17:00"
-              placeholderTextColor={colors.muted}
-              style={styles.input}
-            />
-            <PrimaryButton label="Save" onPress={saveReminder} loading={saving} />
-            <PrimaryButton
-              label="Cancel"
-              variant="ghost"
-              onPress={() => setCreateOpen(false)}
-              style={{ marginTop: spacing.sm }}
-            />
-          </View>
+          <ScrollView
+            keyboardShouldPersistTaps="handled"
+            contentContainerStyle={styles.modalScroll}
+            bounces={false}>
+            <View style={styles.modalCard}>
+              <Text style={styles.modalTitle}>
+                {editItem ? 'Edit reminder' : 'Custom reminder'}
+              </Text>
+              <Text style={styles.label}>Title</Text>
+              <TextInput
+                value={title}
+                onChangeText={setTitle}
+                placeholder="Follow up with client"
+                placeholderTextColor={colors.muted}
+                style={styles.input}
+              />
+              <Text style={styles.label}>Notes (optional)</Text>
+              <TextInput
+                value={message}
+                onChangeText={setMessage}
+                placeholder="Details"
+                placeholderTextColor={colors.muted}
+                style={styles.input}
+              />
+              <DateTimeField
+                label="Remind at"
+                value={remindAtDate}
+                onChange={setRemindAtDate}
+                mode="datetime"
+              />
+              <PrimaryButton label="Save" onPress={saveReminder} loading={saving} />
+              <PrimaryButton
+                label="Cancel"
+                variant="ghost"
+                onPress={() => setCreateOpen(false)}
+                style={{ marginTop: spacing.sm }}
+              />
+            </View>
+          </ScrollView>
         </View>
       </Modal>
     </SafeAreaView>
@@ -287,6 +328,7 @@ export function InboxScreen() {
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   list: { paddingHorizontal: spacing.md, paddingTop: spacing.sm, paddingBottom: 40 },
+  sep: { height: 12 },
   header: { marginBottom: spacing.md, gap: 12 },
   topRow: {
     flexDirection: 'row',
@@ -315,24 +357,19 @@ const styles = StyleSheet.create({
     borderRadius: radius.full,
   },
   addLabel: { color: '#fff', fontWeight: '700', fontSize: 13 },
-  ghostBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-  },
+  ghostBtn: { paddingHorizontal: 10, paddingVertical: 8 },
   ghostLabel: { color: colors.primaryDeep, fontWeight: '700', fontSize: 13 },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
     padding: spacing.md,
-    borderWidth: StyleSheet.hairlineWidth,
+    borderWidth: 1,
     borderColor: colors.border,
-    marginBottom: 1,
   },
   doneCard: { opacity: 0.65 },
-  unread: { borderColor: colors.primary, backgroundColor: colors.primarySoft },
   cardTitle: { fontWeight: '700', color: colors.text, fontSize: 16 },
-  msg: { color: colors.muted, marginTop: 4, fontSize: 13 },
-  meta: { color: colors.muted, marginTop: 6, fontSize: 12 },
+  msg: { color: colors.muted, marginTop: 4, fontSize: 13, lineHeight: 18 },
+  meta: { color: colors.muted, marginTop: 8, fontSize: 12 },
   actions: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: spacing.sm },
   chip: {
     paddingHorizontal: 12,
@@ -343,11 +380,34 @@ const styles = StyleSheet.create({
   dangerChip: { backgroundColor: colors.dangerSoft },
   chipText: { fontSize: 12, fontWeight: '700', color: colors.primaryDeep },
   empty: { color: colors.muted },
+  emptyWrap: {
+    alignItems: 'center',
+    paddingVertical: 48,
+    paddingHorizontal: 24,
+    gap: 8,
+  },
+  emptyIcon: {
+    width: 56,
+    height: 56,
+    borderRadius: 18,
+    backgroundColor: colors.primarySoft,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 4,
+  },
+  emptyTitle: { fontSize: 17, fontWeight: '700', color: colors.text },
+  emptySub: {
+    fontSize: 13,
+    lineHeight: 18,
+    color: colors.muted,
+    textAlign: 'center',
+  },
   modalBackdrop: {
     flex: 1,
     backgroundColor: 'rgba(11,18,38,0.45)',
     justifyContent: 'flex-end',
   },
+  modalScroll: { flexGrow: 1, justifyContent: 'flex-end' },
   modalCard: {
     backgroundColor: colors.surface,
     borderTopLeftRadius: radius.xl,
