@@ -75,9 +75,11 @@ export function InboxScreen() {
 
   const sortedReminders = useMemo(
     () =>
-      [...reminders].sort(
-        (a, b) => new Date(b.remindAt).getTime() - new Date(a.remindAt).getTime(),
-      ),
+      [...reminders].sort((a, b) => {
+        const aAt = new Date(a.createdAt || a.remindAt).getTime();
+        const bAt = new Date(b.createdAt || b.remindAt).getTime();
+        return bAt - aAt;
+      }),
     [reminders],
   );
 

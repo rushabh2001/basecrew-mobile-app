@@ -1,0 +1,24 @@
+diff --git a/node_modules/@react-native-community/datetimepicker/ios/RNDateTimePicker.m b/node_modules/@react-native-community/datetimepicker/ios/RNDateTimePicker.m
+index 9c73c8e..5b350f6 100644
+--- a/node_modules/@react-native-community/datetimepicker/ios/RNDateTimePicker.m
++++ b/node_modules/@react-native-community/datetimepicker/ios/RNDateTimePicker.m
+@@ -23,13 +23,12 @@
+ - (instancetype)initWithFrame:(CGRect)frame
+ {
+   if ((self = [super initWithFrame:frame])) {
+-    #ifndef RCT_NEW_ARCH_ENABLED
+-      // somehow, with Fabric, the callbacks are executed here as well as in RNDateTimePickerComponentView
+-      // so do not register it with Fabric, to avoid potential problems
+-      [self addTarget:self action:@selector(didChange)
+-               forControlEvents:UIControlEventValueChanged];
+-      [self addTarget:self action:@selector(onDismiss:) forControlEvents:UIControlEventEditingDidEnd];
+-    #endif
++    // BaseCrew patch: under RN New Architecture the interop path often mounts this
++    // paper view instead of RNDateTimePickerComponentView, so onChange never fires
++    // unless targets are registered here as well.
++    [self addTarget:self action:@selector(didChange)
++             forControlEvents:UIControlEventValueChanged];
++    [self addTarget:self action:@selector(onDismiss:) forControlEvents:UIControlEventEditingDidEnd];
+ 
+     _reactMinuteInterval = 1;
+   }

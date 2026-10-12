@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BaseCrew real UI screens</title>
+<style>
+  :root {
+    --bg: #FAFBFC;
+    --surface: #FFFFFF;
+    --text: #0F172A;
+    --muted: #8E95A3;
+    --border: #ECEEF2;
+    --navy: #0B1226;
+    --primary: #1E63FF;
+    --primaryDeep: #0B3BE8;
+    --primarySoft: #E8F0FF;
+    --success: #0F766E;
+    --successSoft: #E8F8EF;
+    --danger: #B91C1C;
+    --dangerSoft: #FDEEEC;
+    --warning: #B45309;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #111;
+    color: var(--text);
+    padding: 24px;
+  }
+  .page {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+  }
+  .phone {
+    width: 390px;
+    height: 844px;
+    background: var(--bg);
+    border-radius: 0;
+    overflow: hidden;
+    position: relative;
+    flex-shrink: 0;
+  }
+  .status {
+    height: 54px;
+    padding: 14px 28px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.2px;
+  }
+  .status-right {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .status-right svg {
+    display: block;
+    flex-shrink: 0;
+  }
+  .island {
+    position: absolute;
+    top: 11px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 126px;
+    height: 37px;
+    background: #000;
+    border-radius: 20px;
+  }
+  .content { padding: 0 24px 24px; height: calc(100% - 54px - 84px); overflow: hidden; }
+  .content.full { height: calc(100% - 54px); }
+  .tabbar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 84px;
+    background: #fff;
+    border-top: 1px solid rgba(0,0,0,0.04);
+    display: flex;
+    padding: 8px 8px 24px;
+    box-shadow: 0 -2px 12px rgba(26,29,38,0.05);
+  }
+  .tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--muted);
+  }
+  .tab.active { color: var(--primaryDeep); }
+  .icon {
+    width: 26px; height: 26px;
+    font-size: 22px;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .icon svg { width: 100%; height: 100%; }
+
+  .bell {
+    width: 44px; height: 44px; border-radius: 22px;
+    background: #fff; border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .badge {
+    position: absolute; top: 4px; right: 4px;
+    min-width: 18px; height: 18px; border-radius: 9px;
+    background: var(--danger); color: #fff;
+    font-size: 10px; font-weight: 800;
+    display: flex; align-items: center; justify-content: center;
+    border: 2px solid #fff;
+  }
+  .header-row {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 16px;
+  }
+  .date {
+    font-size: 13px; font-weight: 500; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 4px;
+  }
+  .greeting { font-size: 32px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.15; }
+  .sub { margin-top: 6px; font-size: 15px; color: var(--muted); line-height: 20px; }
+
+  .clock-strip {
+    margin-top: 24px;
+    padding: 16px;
+    background: #fff;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    box-shadow: 0 2px 8px rgba(26,29,38,0.06);
+  }
+  .clock-left { display: flex; align-items: center; gap: 12px; }
+  .dot { width: 10px; height: 10px; border-radius: 5px; background: var(--primary); }
+  .clock-label { font-size: 12px; font-weight: 600; color: var(--muted); }
+  .clock-time { font-size: 17px; font-weight: 700; margin-top: 2px; }
+  .clock-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--primary); color: #fff;
+    padding: 10px 14px; border-radius: 999px;
+    font-size: 13px; font-weight: 700;
+  }
+
+  .stats {
+    display: flex; gap: 10px; margin-top: 24px;
+  }
+  .stat {
+    flex: 1; background: #fff; border: 1px solid var(--border);
+    border-radius: 14px; padding: 10px; text-align: center;
+  }
+  .stat.accent { background: var(--dangerSoft); border-color: var(--dangerSoft); }
+  .stat .v { font-size: 20px; font-weight: 700; }
+  .stat.accent .v { color: var(--danger); }
+  .stat .l { font-size: 11px; font-weight: 600; color: var(--muted); }
+
+  .section-head {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-top: 32px; margin-bottom: 10px;
+  }
+  .section-title { font-size: 18px; font-weight: 700; }
+  .see-all { font-size: 14px; font-weight: 600; color: var(--primaryDeep); }
+
+  .task-card {
+    background: #fff; border: 1px solid var(--border); border-radius: 20px;
+    overflow: hidden; box-shadow: 0 2px 8px rgba(26,29,38,0.06);
+  }
+  .task-row {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 14px 14px 0;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+  }
+  .task-row:last-child { border-bottom: none; }
+  .accent-bar {
+    width: 3px; align-self: stretch; border-radius: 0 2px 2px 0;
+    background: transparent; margin-right: 4px;
+  }
+  .accent-bar.high { background: var(--danger); }
+  .accent-bar.med { background: var(--warning); }
+  .checkbox {
+    width: 24px; height: 24px; border-radius: 12px;
+    border: 2px solid var(--border);
+    margin-top: 2px; flex-shrink: 0;
+  }
+  .checkbox.done {
+    background: var(--success); border-color: var(--success);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .task-title { font-size: 16px; font-weight: 600; line-height: 22px; }
+  .task-title.done { color: var(--muted); text-decoration: line-through; }
+  .meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; border-radius: 999px;
+    background: var(--primarySoft); font-size: 11px; font-weight: 600;
+    color: var(--primaryDeep);
+  }
+  .chip.muted { background: #F3F4F6; color: var(--muted); }
+  .chip.overdue { background: var(--dangerSoft); color: var(--danger); }
+  .chip.progress { background: var(--primarySoft); color: var(--primaryDeep); }
+
+  .secondary {
+    margin-top: 24px;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 14px; border-radius: 14px;
+    background: var(--dangerSoft); color: var(--danger);
+    font-weight: 700; font-size: 14px;
+  }
+
+  .page-title { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .count { color: var(--muted); font-size: 14px; margin-bottom: 16px; }
+  .filters { display: flex; gap: 8px; margin-bottom: 10px; }
+  .filter {
+    padding: 8px 14px; border-radius: 999px;
+    background: #fff; border: 1px solid var(--border);
+    font-size: 13px; font-weight: 600; color: var(--muted);
+  }
+  .filter.active {
+    background: var(--primarySoft); border-color: var(--primary); color: var(--primaryDeep);
+  }
+  .hint { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+  .sec-h {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 10px 4px; font-size: 13px; font-weight: 700;
+    letter-spacing: 0.6px; text-transform: uppercase; color: var(--muted);
+  }
+  .task-list-row {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 4px; border-bottom: 0.5px solid var(--border);
+    background: #fff;
+  }
+  .quick-add {
+    position: absolute; left: 16px; right: 16px; bottom: 96px;
+    display: flex; align-items: center; gap: 10px;
+    background: #fff; border-radius: 16px; padding: 8px;
+    box-shadow: 0 8px 20px rgba(30,99,255,0.18);
+    border: 1px solid var(--border);
+  }
+  .plus {
+    width: 40px; height: 40px; border-radius: 12px;
+    background: var(--primary); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 22px; font-weight: 600;
+  }
+  .quick-add span { color: var(--muted); font-size: 16px; }
+
+  .brand-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .logo-mark {
+    width: 28px; height: 28px; border-radius: 7px;
+    background: linear-gradient(145deg, #1E63FF, #0B3BE8);
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-mark svg { width: 16px; height: 16px; }
+  .title-lg { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .subtitle { font-size: 13px; color: var(--muted); margin-top: 2px; margin-bottom: 12px; }
+  .seg {
+    display: flex; background: #EEF0F4; border-radius: 12px; padding: 3px; margin-bottom: 16px;
+  }
+  .seg button {
+    flex: 1; border: 0; background: transparent; padding: 9px;
+    border-radius: 10px; font-size: 13px; font-weight: 700; color: var(--muted);
+  }
+  .seg button.on { background: #fff; color: var(--navy); box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+  .card {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px;
+    padding: 16px; margin-bottom: 10px;
+  }
+  .row-between { display: flex; justify-content: space-between; align-items: center; }
+  .name { font-size: 16px; font-weight: 700; }
+  .hours { font-size: 15px; font-weight: 700; color: var(--primaryDeep); }
+  .meta-line { font-size: 13px; color: var(--muted); margin-top: 4px; }
+  .entry { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+  .entry-title { font-size: 14px; font-weight: 600; }
+
+  .inbox-title { font-size: 28px; font-weight: 700; letter-spacing: -0.3px; }
+  .add-btn {
+    display: flex; align-items: center; gap: 6px;
+    background: var(--primary); color: #fff;
+    padding: 8px 12px; border-radius: 999px; font-size: 13px; font-weight: 700;
+  }
+  .close {
+    width: 36px; height: 36px; border-radius: 18px;
+    border: 1px solid var(--border); background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; color: var(--navy);
+  }
+  .action-chips { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+  .action-chip {
+    padding: 7px 12px; border-radius: 999px;
+    background: var(--primarySoft); font-size: 12px; font-weight: 700; color: var(--primaryDeep);
+  }
+
+  /* Login */
+  .login-wrap { height: calc(100% - 54px); display: flex; flex-direction: column; }
+  .login-hero {
+    background: var(--navy);
+    padding: 36px 24px 32px;
+    display: flex; align-items: center; justify-content: center;
+    border-bottom-left-radius: 28px;
+    border-bottom-right-radius: 28px;
+  }
+  .login-logo {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .login-mark {
+    width: 36px; height: 36px; border-radius: 9px;
+    background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    position: relative;
+  }
+  .login-mark .sq {
+    position: absolute; border-radius: 4px;
+  }
+  .login-mark .sq1 { width: 18px; height: 18px; background: #9CC3FF; left: 6px; bottom: 6px; opacity: 0.9; }
+  .login-mark .sq2 { width: 16px; height: 16px; background: #1E63FF; left: 10px; bottom: 10px; }
+  .login-mark .sq3 { width: 14px; height: 14px; background: #0B3BE8; left: 14px; bottom: 14px;
+    display: flex; align-items: center; justify-content: center; color: #fff; font-size: 9px; font-weight: 800; }
+  .login-word {
+    font-size: 22px; font-weight: 700; color: #fff; letter-spacing: -0.3px;
+  }
+  .login-body { padding: 32px 24px 24px; flex: 1; }
+  .login-title { font-size: 28px; font-weight: 700; color: var(--navy); margin-bottom: 6px; }
+  .login-sub { font-size: 15px; color: var(--muted); line-height: 22px; margin-bottom: 32px; }
+  .login-field { margin-bottom: 16px; }
+  .login-label { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+  .login-input {
+    background: #fff; border: 1px solid var(--border); border-radius: 14px;
+    padding: 14px 16px; font-size: 16px; color: var(--text);
+  }
+  .login-input.muted { color: var(--muted); }
+  .login-btn {
+    margin-top: 16px;
+    background: var(--primary); color: #fff;
+    text-align: center; font-weight: 700; font-size: 16px;
+    padding: 16px; border-radius: 14px;
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <!-- 0 LOGIN -->
+  <div class="phone" id="screen-login">
+    <div class="island"></div>
+    <div class="status" style="color:#fff; background:var(--navy)"><span>9:41</span><span class="status-right" aria-hidden="true">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7.5" width="3" height="4.5" rx="0.6"/><rect x="4.5" y="5" width="3" height="7" rx="0.6"/><rect x="9" y="2.5" width="3" height="9.5" rx="0.6"/><rect x="13.5" y="0" width="3" height="12" rx="0.6"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 9.2a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8Zm-3.3-1.6a4.7 4.7 0 0 1 6.6 0l-1.1 1.1a3.1 3.1 0 0 0-4.4 0L4.7 7.6Zm-2.4-2.4a8.1 8.1 0 0 1 11.4 0l-1.1 1.1a6.5 6.5 0 0 0-9.2 0L2.3 5.2Z"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2.5" stroke="currentColor" stroke-opacity="0.4"/><rect x="2" y="2" width="20" height="9" rx="1.5" fill="currentColor"/><path d="M25 4.5v4a2 2 0 0 0 0-4Z" fill="currentColor" fill-opacity="0.4"/></svg>
+    </span></div>
+    <div class="login-wrap">
+      <div class="login-hero">
+        <div class="login-logo">
+          <div class="login-mark">
+            <div class="sq sq1"></div>
+            <div class="sq sq2"></div>
+            <div class="sq sq3">✓</div>
+          </div>
+          <div class="login-word">BaseCrew</div>
+        </div>
+      </div>
+      <div class="login-body">
+        <div class="login-title">Welcome back</div>
+        <div class="login-sub">Sign in with your organization to clock in, manage tasks, and stay aligned with your team.</div>
+
+        <div class="login-field">
+          <div class="login-label">Organization code</div>
+          <div class="login-input">acme</div>
+        </div>
+        <div class="login-field">
+          <div class="login-label">Email</div>
+          <div class="login-input">you@company.com</div>
+        </div>
+        <div class="login-field">
+          <div class="login-label">Password</div>
+          <div class="login-input muted">••••••••</div>
+        </div>
+
+        <div class="login-btn">Sign in</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 1 HOME / CLOCK -->
+  <div class="phone" id="screen-home">
+    <div class="island"></div>
+    <div class="status"><span>9:41</span><span class="status-right" aria-hidden="true">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7.5" width="3" height="4.5" rx="0.6"/><rect x="4.5" y="5" width="3" height="7" rx="0.6"/><rect x="9" y="2.5" width="3" height="9.5" rx="0.6"/><rect x="13.5" y="0" width="3" height="12" rx="0.6"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 9.2a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8Zm-3.3-1.6a4.7 4.7 0 0 1 6.6 0l-1.1 1.1a3.1 3.1 0 0 0-4.4 0L4.7 7.6Zm-2.4-2.4a8.1 8.1 0 0 1 11.4 0l-1.1 1.1a6.5 6.5 0 0 0-9.2 0L2.3 5.2Z"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2.5" stroke="currentColor" stroke-opacity="0.4"/><rect x="2" y="2" width="20" height="9" rx="1.5" fill="currentColor"/><path d="M25 4.5v4a2 2 0 0 0 0-4Z" fill="currentColor" fill-opacity="0.4"/></svg>
+    </span></div>
+    <div class="content">
+      <div class="header-row">
+        <div></div>
+        <div class="bell">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0B1226" stroke-width="2"><path d="M6 9a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+          <div class="badge">2</div>
+        </div>
+      </div>
+      <div class="date">Monday, September 7</div>
+      <div class="greeting">Good morning, Alex</div>
+      <div class="sub">Plan your day and stay on track</div>
+
+      <div class="clock-strip">
+        <div class="clock-left">
+          <div class="dot"></div>
+          <div>
+            <div class="clock-label">Working</div>
+            <div class="clock-time">3h 24m</div>
+          </div>
+        </div>
+        <div class="clock-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2.2"><path d="M18 8h-3V5a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v3H6a1 1 0 0 0-1 1v2l2 9h10l2-9V9a1 1 0 0 0-1-1z"/></svg>
+          Start lunch
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div style="color:var(--primaryDeep);margin-bottom:2px">▣</div>
+          <div class="v">5</div>
+          <div class="l">Open</div>
+        </div>
+        <div class="stat accent">
+          <div style="color:var(--danger);margin-bottom:2px">!</div>
+          <div class="v">1</div>
+          <div class="l">Overdue</div>
+        </div>
+        <div class="stat">
+          <div style="color:var(--primaryDeep);margin-bottom:2px">↗</div>
+          <div class="v">3.4</div>
+          <div class="l">Hours</div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <div class="section-title">Focus today</div>
+        <div class="see-all">See all</div>
+      </div>
+      <div class="task-card">
+        <div class="task-row">
+          <div class="accent-bar high"></div>
+          <div class="checkbox"></div>
+          <div>
+            <div class="task-title">Finalize Q3 staffing plan</div>
+            <div class="meta">
+              <span class="chip">Operations</span>
+              <span class="chip overdue">Today</span>
+            </div>
+          </div>
+        </div>
+        <div class="task-row">
+          <div class="accent-bar med"></div>
+          <div class="checkbox"></div>
+          <div>
+            <div class="task-title">Review site attendance report</div>
+            <div class="meta">
+              <span class="chip">Field Ops</span>
+              <span class="chip progress">In progress</span>
+            </div>
+          </div>
+        </div>
+        <div class="task-row">
+          <div class="accent-bar"></div>
+          <div class="checkbox"></div>
+          <div>
+            <div class="task-title">Confirm vendor onboarding slots</div>
+            <div class="meta">
+              <span class="chip">HR</span>
+              <span class="chip muted">Tomorrow</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="secondary">Clock out</div>
+    </div>
+    <div class="tabbar">
+      <div class="tab active"><div class="icon">⌂</div>Today</div>
+      <div class="tab"><div class="icon">☑</div>Tasks</div>
+      <div class="tab"><div class="icon">👤👤</div>Team</div>
+      <div class="tab"><div class="icon">☺</div>Profile</div>
+    </div>
+  </div>
+
+  <!-- 2 TODAY FOCUSED (same home, not clocked - for "plan your day") -->
+  <div class="phone" id="screen-today">
+    <div class="island"></div>
+    <div class="status"><span>9:41</span><span class="status-right" aria-hidden="true">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7.5" width="3" height="4.5" rx="0.6"/><rect x="4.5" y="5" width="3" height="7" rx="0.6"/><rect x="9" y="2.5" width="3" height="9.5" rx="0.6"/><rect x="13.5" y="0" width="3" height="12" rx="0.6"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 9.2a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8Zm-3.3-1.6a4.7 4.7 0 0 1 6.6 0l-1.1 1.1a3.1 3.1 0 0 0-4.4 0L4.7 7.6Zm-2.4-2.4a8.1 8.1 0 0 1 11.4 0l-1.1 1.1a6.5 6.5 0 0 0-9.2 0L2.3 5.2Z"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2.5" stroke="currentColor" stroke-opacity="0.4"/><rect x="2" y="2" width="20" height="9" rx="1.5" fill="currentColor"/><path d="M25 4.5v4a2 2 0 0 0 0-4Z" fill="currentColor" fill-opacity="0.4"/></svg>
+    </span></div>
+    <div class="content">
+      <div class="header-row">
+        <div></div>
+        <div class="bell">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0B1226" stroke-width="2"><path d="M6 9a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+        </div>
+      </div>
+      <div class="date">Monday, September 7</div>
+      <div class="greeting">Good morning, Alex</div>
+      <div class="sub">Plan your day and stay on track</div>
+
+      <div class="clock-strip">
+        <div class="clock-left">
+          <div class="dot" style="background:var(--muted)"></div>
+          <div>
+            <div class="clock-label">Not clocked in</div>
+            <div class="clock-time">Tap to start your day</div>
+          </div>
+        </div>
+        <div class="clock-btn">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="#fff" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
+          Clock in
+        </div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><div class="v">8</div><div class="l">Open</div></div>
+        <div class="stat"><div class="v">0</div><div class="l">Overdue</div></div>
+        <div class="stat"><div class="v">-</div><div class="l">Hours</div></div>
+      </div>
+
+      <div class="section-head">
+        <div class="section-title">Focus today</div>
+        <div class="see-all">See all</div>
+      </div>
+      <div class="task-card">
+        <div class="task-row">
+          <div class="accent-bar high"></div>
+          <div class="checkbox"></div>
+          <div>
+            <div class="task-title">Prepare client kickoff brief</div>
+            <div class="meta"><span class="chip">Delivery</span><span class="chip muted">Today</span></div>
+          </div>
+        </div>
+        <div class="task-row">
+          <div class="accent-bar"></div>
+          <div class="checkbox"></div>
+          <div>
+            <div class="task-title">Approve leave requests</div>
+            <div class="meta"><span class="chip">People</span><span class="chip muted">Today</span></div>
+          </div>
+        </div>
+        <div class="task-row">
+          <div class="accent-bar"></div>
+          <div class="checkbox"></div>
+          <div>
+            <div class="task-title">Sync warehouse inventory notes</div>
+            <div class="meta"><span class="chip">Logistics</span><span class="chip muted">Today</span></div>
+          </div>
+        </div>
+        <div class="task-row">
+          <div class="accent-bar"></div>
+          <div class="checkbox done"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div>
+            <div class="task-title done">Send morning standup update</div>
+            <div class="meta"><span class="chip">Ops</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tabbar">
+      <div class="tab active"><div class="icon">⌂</div>Today</div>
+      <div class="tab"><div class="icon">☑</div>Tasks</div>
+      <div class="tab"><div class="icon">👤👤</div>Team</div>
+      <div class="tab"><div class="icon">☺</div>Profile</div>
+    </div>
+  </div>
+
+  <!-- 3 TASKS -->
+  <div class="phone" id="screen-tasks">
+    <div class="island"></div>
+    <div class="status"><span>9:41</span><span class="status-right" aria-hidden="true">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7.5" width="3" height="4.5" rx="0.6"/><rect x="4.5" y="5" width="3" height="7" rx="0.6"/><rect x="9" y="2.5" width="3" height="9.5" rx="0.6"/><rect x="13.5" y="0" width="3" height="12" rx="0.6"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 9.2a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8Zm-3.3-1.6a4.7 4.7 0 0 1 6.6 0l-1.1 1.1a3.1 3.1 0 0 0-4.4 0L4.7 7.6Zm-2.4-2.4a8.1 8.1 0 0 1 11.4 0l-1.1 1.1a6.5 6.5 0 0 0-9.2 0L2.3 5.2Z"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2.5" stroke="currentColor" stroke-opacity="0.4"/><rect x="2" y="2" width="20" height="9" rx="1.5" fill="currentColor"/><path d="M25 4.5v4a2 2 0 0 0 0-4Z" fill="currentColor" fill-opacity="0.4"/></svg>
+    </span></div>
+    <div class="content" style="padding-left:16px;padding-right:16px;height:calc(100% - 54px)">
+      <div class="header-row">
+        <div class="page-title">My Tasks</div>
+        <div class="bell">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0B1226" stroke-width="2"><path d="M6 9a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+        </div>
+      </div>
+      <div class="count">6 open tasks</div>
+      <div class="filters">
+        <div class="filter active">All</div>
+        <div class="filter">Today</div>
+        <div class="filter">Projects</div>
+      </div>
+      <div class="hint">Swipe right or tap the circle to complete</div>
+
+      <div class="sec-h"><span>Today</span><span>3</span></div>
+      <div class="task-list-row">
+        <div class="checkbox"></div>
+        <div>
+          <div class="task-title">Finalize Q3 staffing plan</div>
+          <div class="meta"><span class="chip">Operations</span><span class="chip overdue">Today</span></div>
+        </div>
+      </div>
+      <div class="task-list-row">
+        <div class="checkbox"></div>
+        <div>
+          <div class="task-title">Review site attendance report</div>
+          <div class="meta"><span class="chip">Field Ops</span><span class="chip progress">In progress</span></div>
+        </div>
+      </div>
+      <div class="task-list-row">
+        <div class="checkbox"></div>
+        <div>
+          <div class="task-title">Confirm vendor onboarding slots</div>
+          <div class="meta"><span class="chip">HR</span><span class="chip muted">Today</span></div>
+        </div>
+      </div>
+
+      <div class="sec-h"><span>Upcoming</span><span>2</span></div>
+      <div class="task-list-row">
+        <div class="checkbox"></div>
+        <div>
+          <div class="task-title">Draft week-two deployment checklist</div>
+          <div class="meta"><span class="chip">Delivery</span><span class="chip muted">Wed</span></div>
+        </div>
+      </div>
+      <div class="task-list-row">
+        <div class="checkbox"></div>
+        <div>
+          <div class="task-title">Schedule performance check-ins</div>
+          <div class="meta"><span class="chip">People</span><span class="chip muted">Fri</span></div>
+        </div>
+      </div>
+
+      <div class="quick-add">
+        <div class="plus">+</div>
+        <span>Add a task...</span>
+      </div>
+    </div>
+    <div class="tabbar">
+      <div class="tab"><div class="icon">⌂</div>Today</div>
+      <div class="tab active"><div class="icon">☑</div>Tasks</div>
+      <div class="tab"><div class="icon">👤👤</div>Team</div>
+      <div class="tab"><div class="icon">☺</div>Profile</div>
+    </div>
+  </div>
+
+  <!-- 4 TEAM -->
+  <div class="phone" id="screen-team">
+    <div class="island"></div>
+    <div class="status"><span>9:41</span><span class="status-right" aria-hidden="true">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7.5" width="3" height="4.5" rx="0.6"/><rect x="4.5" y="5" width="3" height="7" rx="0.6"/><rect x="9" y="2.5" width="3" height="9.5" rx="0.6"/><rect x="13.5" y="0" width="3" height="12" rx="0.6"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 9.2a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8Zm-3.3-1.6a4.7 4.7 0 0 1 6.6 0l-1.1 1.1a3.1 3.1 0 0 0-4.4 0L4.7 7.6Zm-2.4-2.4a8.1 8.1 0 0 1 11.4 0l-1.1 1.1a6.5 6.5 0 0 0-9.2 0L2.3 5.2Z"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2.5" stroke="currentColor" stroke-opacity="0.4"/><rect x="2" y="2" width="20" height="9" rx="1.5" fill="currentColor"/><path d="M25 4.5v4a2 2 0 0 0 0-4Z" fill="currentColor" fill-opacity="0.4"/></svg>
+    </span></div>
+    <div class="content full">
+      <div class="header-row">
+        <div class="brand-row">
+          <div class="logo-mark">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
+          <div>
+            <div class="title-lg">Team today</div>
+          </div>
+        </div>
+        <div class="bell">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="#0B1226" stroke-width="2"><path d="M6 9a6 6 0 1 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10 21a2 2 0 0 0 4 0"/></svg>
+        </div>
+      </div>
+      <div class="subtitle">Activity for 2026-09-07</div>
+      <div class="seg">
+        <button class="on">Activity</button>
+        <button>Clock</button>
+      </div>
+
+      <div class="card">
+        <div class="row-between">
+          <div class="name">Priya Shah</div>
+          <div class="hours">4h 12m</div>
+        </div>
+        <div class="meta-line">Operations</div>
+        <div class="entry">
+          <div class="entry-title">Site audit checklist · live</div>
+          <div class="meta-line">Field Ops · 1h 40m</div>
+        </div>
+        <div class="entry">
+          <div class="entry-title">Vendor follow-ups</div>
+          <div class="meta-line">Procurement · 2h 32m</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row-between">
+          <div class="name">Jordan Lee</div>
+          <div class="hours">3h 05m</div>
+        </div>
+        <div class="meta-line">Delivery</div>
+        <div class="entry">
+          <div class="entry-title">Client kickoff prep</div>
+          <div class="meta-line">Delivery · 3h 05m</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="row-between">
+          <div class="name">Sam Okonkwo</div>
+          <div class="hours">2h 48m</div>
+        </div>
+        <div class="meta-line">People</div>
+        <div class="entry">
+          <div class="entry-title">Onboarding docs review</div>
+          <div class="meta-line">HR · 2h 48m</div>
+        </div>
+      </div>
+    </div>
+    <div class="tabbar">
+      <div class="tab"><div class="icon">⌂</div>Today</div>
+      <div class="tab"><div class="icon">☑</div>Tasks</div>
+      <div class="tab active"><div class="icon">👤👤</div>Team</div>
+      <div class="tab"><div class="icon">☺</div>Profile</div>
+    </div>
+  </div>
+
+  <!-- 5 INBOX -->
+  <div class="phone" id="screen-inbox">
+    <div class="island"></div>
+    <div class="status"><span>9:41</span><span class="status-right" aria-hidden="true">
+      <svg width="17" height="12" viewBox="0 0 17 12" fill="currentColor"><rect x="0" y="7.5" width="3" height="4.5" rx="0.6"/><rect x="4.5" y="5" width="3" height="7" rx="0.6"/><rect x="9" y="2.5" width="3" height="9.5" rx="0.6"/><rect x="13.5" y="0" width="3" height="12" rx="0.6"/></svg>
+      <svg width="16" height="12" viewBox="0 0 16 12" fill="currentColor"><path d="M8 9.2a1.4 1.4 0 1 0 0 2.8 1.4 1.4 0 0 0 0-2.8Zm-3.3-1.6a4.7 4.7 0 0 1 6.6 0l-1.1 1.1a3.1 3.1 0 0 0-4.4 0L4.7 7.6Zm-2.4-2.4a8.1 8.1 0 0 1 11.4 0l-1.1 1.1a6.5 6.5 0 0 0-9.2 0L2.3 5.2Z"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13" fill="none"><rect x="0.5" y="0.5" width="23" height="12" rx="2.5" stroke="currentColor" stroke-opacity="0.4"/><rect x="2" y="2" width="20" height="9" rx="1.5" fill="currentColor"/><path d="M25 4.5v4a2 2 0 0 0 0-4Z" fill="currentColor" fill-opacity="0.4"/></svg>
+    </span></div>
+    <div class="content full" style="padding-left:16px;padding-right:16px">
+      <div class="header-row" style="margin-bottom:12px">
+        <div class="inbox-title">Inbox</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div class="add-btn">+ Add</div>
+          <div class="close">×</div>
+        </div>
+      </div>
+      <div class="seg">
+        <button class="on">Reminders</button>
+        <button>Alerts</button>
+      </div>
+
+      <div class="card">
+        <div class="name" style="font-size:16px">Follow up with East site lead</div>
+        <div class="meta-line">Confirm tomorrow's shift coverage</div>
+        <div class="meta-line">Sep 7, 5:00 PM</div>
+        <div class="action-chips">
+          <div class="action-chip">Complete</div>
+          <div class="action-chip">Edit</div>
+          <div class="action-chip" style="background:var(--dangerSoft);color:var(--danger)">Delete</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="name" style="font-size:16px">Submit weekly hours review</div>
+        <div class="meta-line">Check overtime flags before Friday</div>
+        <div class="meta-line">Sep 8, 10:00 AM</div>
+        <div class="action-chips">
+          <div class="action-chip">Complete</div>
+          <div class="action-chip">Edit</div>
+          <div class="action-chip" style="background:var(--dangerSoft);color:var(--danger)">Delete</div>
+        </div>
+      </div>
+      <div class="card" style="opacity:0.65">
+        <div class="name" style="font-size:16px">Prep standup notes</div>
+        <div class="meta-line">Sep 7, 8:30 AM</div>
+        <div class="action-chips">
+          <div class="action-chip">Reopen</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
