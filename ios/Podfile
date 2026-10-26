@@ -2,10 +2,9 @@
 # global modular headers make React-RuntimeCore and React-jsitooling both expose
 # module react_runtime, which breaks the build on Xcode 26 (RN 0.79 + New Arch).
 
-# Prefer git Specs when cdn.cocoapods.org returns 403 (common on some networks).
-# source 'https://cdn.cocoapods.org/'
-# Fallback if CDN is blocked: comment the line above and uncomment:
-source 'https://github.com/CocoaPods/Specs.git'
+# Prefer CDN; fall back to git Specs only if CDN returns 403 on your network.
+source 'https://cdn.cocoapods.org/'
+# source 'https://github.com/CocoaPods/Specs.git'
 
 # Resolve react_native_pods.rb with node to allow for hoisting
 require Pod::Executable.execute_command('node', ['-p',

@@ -44,7 +44,7 @@ cd mobile-app
 npm install
 
 # iOS pods (first time / after native deps change)
-cd ios && bundle install && bundle exec pod install && cd ..
+cd ios && arch -arm64 pod install && cd ..
 
 npm start
 # other terminal:
@@ -52,6 +52,22 @@ npm run ios
 # or
 npm run android
 ```
+
+## Splash screen
+
+Branded navy launch screen (`#0B1226`) via `react-native-bootsplash`:
+
+- **iOS** - BaseCrew wordmark (`BootSplash.storyboard`)
+- **Android** - BaseCrew icon mark (Android 12+ circular splash)
+
+Assets live in `assets/bootsplash/`. After changing the logo, regenerate with:
+
+```bash
+npx react-native-bootsplash generate assets/bootsplash-logo-mark.png \
+  --platforms=android,ios --background="#0B1226" --logo-width=120
+```
+
+Then replace the iOS imageset with `assets/bootsplash-logo-wide.png` for the wordmark (see prior setup).
 
 ## Sign in
 

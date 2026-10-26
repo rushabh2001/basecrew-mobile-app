@@ -237,7 +237,7 @@ export function InboxScreen() {
             ) : (
               <View style={styles.emptyWrap}>
                 <View style={styles.emptyIcon}>
-                  <AppIcon name="inbox" size={28} color={colors.primaryDeep} />
+                  <AppIcon name="inbox" size={28} color={colors.navy} />
                 </View>
                 <Text style={styles.emptyTitle}>You're all caught up</Text>
                 <Text style={styles.emptySub}>
@@ -353,14 +353,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.navy,
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: radius.full,
   },
   addLabel: { color: '#fff', fontWeight: '700', fontSize: 13 },
   ghostBtn: { paddingHorizontal: 10, paddingVertical: 8 },
-  ghostLabel: { color: colors.primaryDeep, fontWeight: '700', fontSize: 13 },
+  ghostLabel: { color: colors.navyMid, fontWeight: '700', fontSize: 13 },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.md,
@@ -377,10 +377,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: radius.full,
-    backgroundColor: colors.primarySoft,
+    backgroundColor: colors.navySoft,
   },
   dangerChip: { backgroundColor: colors.dangerSoft },
-  chipText: { fontSize: 12, fontWeight: '700', color: colors.primaryDeep },
+  chipText: { fontSize: 12, fontWeight: '700', color: colors.navyMid },
   empty: { color: colors.muted },
   emptyWrap: {
     alignItems: 'center',
@@ -392,12 +392,12 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 18,
-    backgroundColor: colors.primarySoft,
+    backgroundColor: colors.navySoft,
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: 4,
   },
-  emptyTitle: { fontSize: 17, fontWeight: '700', color: colors.text },
+  emptyTitle: { fontSize: 17, fontWeight: '700', color: colors.navy },
   emptySub: {
     fontSize: 13,
     lineHeight: 18,

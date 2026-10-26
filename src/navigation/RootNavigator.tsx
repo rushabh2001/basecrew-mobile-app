@@ -1,8 +1,9 @@
-import React from 'react';
-import { ActivityIndicator, Platform, View } from 'react-native';
+import React, { useEffect } from 'react';
+import { Platform, View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import BootSplash from 'react-native-bootsplash';
 import { useAuth } from '../auth/AuthContext';
 import { AppIcon } from '../components/AppIcon';
 import { LoginScreen } from '../screens/LoginScreen';
@@ -105,12 +106,14 @@ function MainStack() {
 export function RootNavigator() {
   const { bootstrapping, token } = useAuth();
 
+  useEffect(() => {
+    if (bootstrapping) return;
+    void BootSplash.hide({ fade: true });
+  }, [bootstrapping]);
+
+  // Keep the branded native splash visible while session restores.
   if (bootstrapping) {
-    return (
-      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.bg }}>
-        <ActivityIndicator color={colors.primary} size="large" />
-      </View>
-    );
+    return <View style={{ flex: 1, backgroundColor: colors.navy }} />;
   }
 
   return (

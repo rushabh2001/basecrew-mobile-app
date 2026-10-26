@@ -8,6 +8,8 @@ export const colors = {
   borderStrong: '#D8DCE3',
   navy: '#0B1226',
   navyMid: '#111A4A',
+  navyLight: '#1A2555',
+  navySoft: '#EEF1F8',
   primary: '#1E63FF',
   primaryDeep: '#0B3BE8',
   primarySoft: '#E8F0FF',

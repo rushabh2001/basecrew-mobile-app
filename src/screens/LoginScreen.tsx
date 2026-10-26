@@ -48,7 +48,8 @@ export function LoginScreen() {
   return (
     <SafeAreaView style={styles.safe}>
       <View style={styles.hero}>
-        <BrandLogo variant="dark" height={42} />
+        <BrandLogo variant="dark" height={72} />
+        <Text style={styles.heroTag}>Workspace for growing teams</Text>
       </View>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -102,6 +103,7 @@ export function LoginScreen() {
 
           <PrimaryButton
             label="Sign in"
+            variant="navy"
             onPress={onSubmit}
             loading={loading}
             disabled={!email || !password}
@@ -117,11 +119,19 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   hero: {
     backgroundColor: colors.navy,
-    paddingVertical: spacing.xl,
+    paddingTop: spacing.xl + 8,
+    paddingBottom: spacing.xl + 4,
     paddingHorizontal: spacing.lg,
     alignItems: 'center',
     borderBottomLeftRadius: radius.xl,
     borderBottomRightRadius: radius.xl,
+  },
+  heroTag: {
+    marginTop: spacing.md,
+    fontSize: 13,
+    fontWeight: '600',
+    color: colors.glow,
+    letterSpacing: 0.2,
   },
   container: {
     flexGrow: 1,
@@ -143,19 +153,19 @@ const styles = StyleSheet.create({
   field: { marginBottom: spacing.md },
   label: {
     fontSize: 13,
-    fontWeight: '600',
-    color: colors.text,
+    fontWeight: '700',
+    color: colors.navyMid,
     marginBottom: spacing.xs,
   },
   input: {
     backgroundColor: colors.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
+    borderWidth: 1.5,
+    borderColor: colors.borderStrong,
     borderRadius: radius.md,
     paddingHorizontal: spacing.md,
     paddingVertical: 14,
     fontSize: 16,
-    color: colors.text,
+    color: colors.navy,
   },
   error: {
     color: colors.danger,

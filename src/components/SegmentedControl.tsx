@@ -29,7 +29,7 @@ export function SegmentedControl({ options, value, onChange }: Props) {
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
-    backgroundColor: colors.primarySoft,
+    backgroundColor: colors.navySoft,
     borderRadius: radius.md,
     padding: 4,
     gap: 4,
@@ -41,9 +41,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   chipActive: {
-    backgroundColor: colors.surface,
+    backgroundColor: colors.navy,
     shadowColor: colors.navy,
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.2,
     shadowRadius: 6,
     shadowOffset: { width: 0, height: 2 },
     elevation: 2,
@@ -51,9 +51,9 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.muted,
+    color: colors.navyMid,
   },
   labelActive: {
-    color: colors.primaryDeep,
+    color: '#fff',
   },
 });

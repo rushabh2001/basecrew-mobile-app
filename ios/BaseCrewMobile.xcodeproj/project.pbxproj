@@ -9,13 +9,16 @@
 /* Begin PBXBuildFile section */
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		361CC84FC8EB5F5549D98C1B /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */; };
+		4852BFB67A4B4B3887053C21 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 06A98310B21A4C3AAD616C30 /* Colors.xcassets */; };
 		761780ED2CA45674006654EE /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 761780EC2CA45674006654EE /* AppDelegate.swift */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9CEF32441376093D3690F94F /* Pods_BaseCrewMobile.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FE791D14CAA7FBE11F7B6989 /* Pods_BaseCrewMobile.framework */; };
+		C1C4EFC19B55402B80F25383 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = A8468E690D594C8183790B6E /* BootSplash.storyboard */; };
 		F4237C2E305BB77A0024E59B /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = F4237C2D305BB7790024E59B /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		06A98310B21A4C3AAD616C30 /* Colors.xcassets */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = folder.assetcatalog; name = Colors.xcassets; path = BaseCrewMobile/Colors.xcassets; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* BaseCrewMobile.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BaseCrewMobile.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = BaseCrewMobile/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = BaseCrewMobile/Info.plist; sourceTree = "<group>"; };
@@ -23,6 +26,7 @@
 		761780EC2CA45674006654EE /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = BaseCrewMobile/AppDelegate.swift; sourceTree = "<group>"; };
 		78890A1B46EE282E763B31C2 /* Pods-BaseCrewMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BaseCrewMobile.debug.xcconfig"; path = "Target Support Files/Pods-BaseCrewMobile/Pods-BaseCrewMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = BaseCrewMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		A8468E690D594C8183790B6E /* BootSplash.storyboard */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = BootSplash.storyboard; path = BaseCrewMobile/BootSplash.storyboard; sourceTree = "<group>"; };
 		B6D05FEC28E28B0AAE2F3421 /* Pods-BaseCrewMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BaseCrewMobile.release.xcconfig"; path = "Target Support Files/Pods-BaseCrewMobile/Pods-BaseCrewMobile.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F4237C2D305BB7790024E59B /* GoogleService-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
@@ -52,6 +56,8 @@
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB81A68108700A75B9A /* PrivacyInfo.xcprivacy */,
 				F4237C2D305BB7790024E59B /* GoogleService-Info.plist */,
+				A8468E690D594C8183790B6E /* BootSplash.storyboard */,
+				06A98310B21A4C3AAD616C30 /* Colors.xcassets */,
 			);
 			name = BaseCrewMobile;
 			sourceTree = "<group>";
@@ -168,6 +174,8 @@
 				F4237C2E305BB77A0024E59B /* GoogleService-Info.plist in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 				361CC84FC8EB5F5549D98C1B /* PrivacyInfo.xcprivacy in Resources */,
+				C1C4EFC19B55402B80F25383 /* BootSplash.storyboard in Resources */,
+				4852BFB67A4B4B3887053C21 /* Colors.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

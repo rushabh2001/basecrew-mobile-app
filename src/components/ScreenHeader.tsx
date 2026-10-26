@@ -54,7 +54,9 @@ export function ScreenHeader({
   return (
     <View style={styles.wrap}>
       <View style={styles.left}>
-        {showLogo ? <BrandLogo variant="dark" height={28} /> : null}
+        {showLogo ? (
+          <BrandLogo variant={onDark ? 'dark' : 'light'} height={30} />
+        ) : null}
         {title ? (
           <View style={showLogo ? styles.titleBlock : undefined}>
             <Text style={[styles.title, onDark && styles.titleDark]}>{title}</Text>
